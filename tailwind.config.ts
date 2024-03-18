@@ -72,6 +72,12 @@ const config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      backgroundImage: {
+        login: "url('/login-thumb.jpg')",
+      },
+      screens: {
+        medium: "990px",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
