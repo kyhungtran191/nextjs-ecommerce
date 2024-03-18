@@ -18,7 +18,9 @@ import AclGuard from "@/components/auth/AclGuard";
 import { defaultACLObj } from "@/configs/acl";
 
 // ** Third Party Import
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Poppins } from "next/font/google";
 // ** Contexts
 
 // ** Global css styles
@@ -42,6 +44,11 @@ const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
     return <AuthGuard fallback={<FallbackSpinner />}>{children}</AuthGuard>;
   }
 };
+// Font family
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
 
 export default function App(props: ExtendedAppProps) {
   const { Component, pageProps } = props;
@@ -53,20 +60,33 @@ export default function App(props: ExtendedAppProps) {
   const guestGuard = Component.guestGuard ?? false;
 
   const aclAbilities = Component.acl ?? defaultACLObj;
+
+  // Query Client (React Query)
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+      },
+    },
+  });
+
   return (
-    <>
+    <main className={poppins.className}>
       <Head>
-        <title>Material Design React Admin Template</title>
+        <title>HShop</title>
       </Head>
-      <Guard authGuard={authGuard} guestGuard={guestGuard}>
-        <AclGuard
-          aclAbilities={aclAbilities}
-          guestGuard={guestGuard}
-          authGuard={authGuard}
-        >
-          {getLayout(<Component {...pageProps} />)}
-        </AclGuard>
-      </Guard>
-    </>
+      <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
+        <Guard authGuard={authGuard} guestGuard={guestGuard}>
+          <AclGuard
+            aclAbilities={aclAbilities}
+            guestGuard={guestGuard}
+            authGuard={authGuard}
+          >
+            {getLayout(<Component {...pageProps} />)}
+          </AclGuard>
+        </Guard>
+      </QueryClientProvider>
+    </main>
   );
 }
