@@ -8,9 +8,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker } from "react-day-picker";
+import {
+  DayPicker,
+  DayPickerDefaultProps,
+  DayPickerMultipleProps,
+  DayPickerRangeProps,
+  DayPickerSingleProps,
+} from "react-day-picker";
 import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { ReactDatePickerProps } from "react-datepicker";
 
 interface IProps {
   className?: string;
@@ -22,7 +29,11 @@ export default function DatePickerCustom({
   classNames,
   showOutsideDays = true,
   ...props
-}: IProps) {
+}:
+  | (IProps & DayPickerDefaultProps)
+  | DayPickerSingleProps
+  | DayPickerMultipleProps
+  | DayPickerRangeProps) {
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
