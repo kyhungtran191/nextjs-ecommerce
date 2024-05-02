@@ -13,10 +13,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { AlignJustify } from "lucide-react";
+import { useRouter } from "next/router";
 interface IProps {
   className: string;
 }
 export default function MenuMobile({ className }: IProps) {
+  const router = useRouter();
+  console.log(router.pathname);
   return (
     <div className={className}>
       <Sheet>
