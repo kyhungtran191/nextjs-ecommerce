@@ -8,9 +8,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker } from "react-day-picker";
+import {
+  DayPicker,
+  DayPickerDefaultProps,
+  DayPickerMultipleProps,
+  DayPickerRangeProps,
+  DayPickerSingleProps,
+} from "react-day-picker";
 import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { ReactDatePickerProps } from "react-datepicker";
 
 interface IProps {
   className?: string;
@@ -22,7 +29,11 @@ export default function DatePickerCustom({
   classNames,
   showOutsideDays = true,
   ...props
-}: IProps) {
+}:
+  | (IProps & DayPickerDefaultProps)
+  | DayPickerSingleProps
+  | DayPickerMultipleProps
+  | DayPickerRangeProps) {
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -62,12 +73,14 @@ export default function DatePickerCustom({
       components={{
         Dropdown: ({ value, onChange, children, ...props }) => {
           const options = React.Children.toArray(children);
-          const selected = options.find((child) => child.props.value === value);
-          const handleChange = (value) => {
+          const selected: any = options.find(
+            (child: any) => child.props.value === value
+          );
+          const handleChange = (value: any) => {
             const changeEvent = {
               target: { value },
             };
-            onChange?.(changeEvent);
+            onChange?.(changeEvent as any);
           };
           return (
             <Select
@@ -81,7 +94,7 @@ export default function DatePickerCustom({
               </SelectTrigger>
               <SelectContent position="popper">
                 <ScrollArea className="h-80">
-                  {options.map((option, id) => (
+                  {options.map((option: any, id) => (
                     <SelectItem
                       key={`${option.props.value}-${id}`}
                       value={option.props.value?.toString() ?? ""}

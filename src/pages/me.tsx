@@ -76,7 +76,7 @@ export default function Profile() {
 
             <DatePickerCustom
               mode="single"
-              captionLayout="dropdown-buttons"
+              // captionLayout="dropdown-buttons"
               // selected={date}
               // onSelect={setDate}
               fromYear={1960}
@@ -89,4 +89,3 @@ export default function Profile() {
     </>
   );
 }
-
