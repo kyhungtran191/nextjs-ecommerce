@@ -34,7 +34,7 @@ export default function SignUp() {
       {/* Right */}
       <div className="w-full col-span-2 p-8 medium:py-14 medium:px-10 medium:col-span-1 flex-col max-w-[90%] medium:max-w-[70%] m-auto rounded-lg  max-h-auto shadow-2xl">
         <div className="flex justify-end">
-          <Button className="">
+          <Button className="bg-purple">
             <Link href="/">Back to Homepage</Link>
           </Button>
         </div>
@@ -99,7 +99,7 @@ export default function SignUp() {
           </div>
           <Button
             type="submit"
-            className={`w-full py-6 mt-8 text-lg transition-all duration-300 ease-in-out bg-[#9a84ec] bg-opacity-90  hover:bg-opacity-100 ${
+            className={`w-full py-6 mt-8 text-lg transition-all duration-300 ease-in-out bg-purple bg-opacity-90  hover:bg-opacity-100 ${
               isLoading ? "pointer-events-none bg-opacity-65" : ""
             }`}
           >
