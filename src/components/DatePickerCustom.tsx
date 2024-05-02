@@ -58,7 +58,6 @@ export default function DatePickerCustom({
         day_range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
-        ...classNames,
       }}
       components={{
         Dropdown: ({ value, onChange, children, ...props }) => {
