@@ -21,6 +21,7 @@ import { defaultACLObj } from "@/configs/acl";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Poppins } from "next/font/google";
+import GeneralLayout from "@/layout/GeneralLayout";
 // ** Contexts
 
 // ** Global css styles
@@ -53,7 +54,7 @@ const poppins = Poppins({
 export default function App(props: ExtendedAppProps) {
   const { Component, pageProps } = props;
 
-  const getLayout = Component.getLayout ?? ((page) => <>{page}</>);
+  const getLayout = Component.getLayout ?? ((page) => <GeneralLayout>{page}</GeneralLayout>);
 
   const authGuard = Component.authGuard ?? true;
 
