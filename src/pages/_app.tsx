@@ -54,7 +54,7 @@ const poppins = Poppins({
 export default function App(props: ExtendedAppProps) {
   const { Component, pageProps } = props;
 
-  const getLayout = Component.getLayout ?? ((page) => <GeneralLayout>{page}</GeneralLayout>);
+  const getLayout = Component.getLayout ?? ((page) => <>{page}</>);
 
   const authGuard = Component.authGuard ?? true;
 
