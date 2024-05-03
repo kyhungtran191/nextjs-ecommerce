@@ -3,27 +3,48 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import { toast } from "react-toastify";
+import Logo from "../../../public/logo.png";
+import { Separator } from "@/components/ui/separator";
+import { useMutation } from "@tanstack/react-query";
+import { logout } from "@/services/auth.services";
+import { clearLS } from "@/utils/auth";
+import { useRouter } from "next/router";
+import { useAppContext } from "@/context/app.context";
 
 export default function Header() {
-
+  const { setIsAuth, setUser, user, isAuth } = useAppContext();
+  const router = useRouter();
+  const logoutMutation = useMutation({
+    mutationFn: () => logout(),
+    onSuccess() {
+      clearLS();
+      setIsAuth(false);
+      setUser(undefined);
+      toast.success("Logout successfully!");
+      // router.push("/login");
+    },
+  });
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
   return (
     <header className="h-[72px] w-full sticky top-0 left-0 right-0 shadow-md z-30 bg-white text-black ">
       <nav className="container h-full flex justify-between items-center leading-[72px] relative">
         <div className="flex items-center">
-          <Link href="/" className="flex items-center justify-center gap-4">
+          <Link href="/" className="flex items-center justify-center gap-2">
             <Image
               alt="logo"
-              src="../logo.png"
-              className="flex-shrink-0 object-cover w-10 h-10 sm:h-16 sm:w-16"
+              src={Logo}
+              width={20}
+              height={20}
+              className="flex-shrink-0 object-cover w-8 h-8 sm:h-16 sm:w-16"
             />
-            <h1 className="text-sm font-bold text-center sm:text-xl">
-              Magazine University System
-            </h1>
+            <h1 className="text-sm font-bold text-center sm:text-xl">Shop</h1>
           </Link>
         </div>
         <div className="items-center hidden ml-8 lg:flex absolute left-[50%] -transition-x-1/2">
@@ -36,41 +57,68 @@ export default function Header() {
             ))}
         </div>
         <div className="flex items-center gap-x-5">
-          <Popover>
-            <PopoverTrigger asChild className="cursor-pointer">
-              <Avatar>
-                <AvatarImage
-                  src="https://variety.com/wp-content/uploads/2021/04/Avatar.jpg"
-                  className="object-cover"
-                ></AvatarImage>
-                <AvatarFallback>CN</AvatarFallback>
-              </Avatar>
-            </PopoverTrigger>
-            <PopoverContent className="px-2 w-50">
-              <div className="grid gap-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium leading-none">
-                    trankyhung225@gmail.com
-                  </h4>
-                  <p className="text-sm text-muted-foreground">Student</p>
-                </div>
-                <div className="gap-2 text-slate-700">
-                  <div className="flex items-center w-full px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 gap-x-3">
-                    My Profile
+          {isAuth && user && (
+            <Popover>
+              <PopoverTrigger asChild className="cursor-pointer">
+                <Avatar>
+                  <AvatarImage
+                    src="https://variety.com/wp-content/uploads/2021/04/Avatar.jpg"
+                    className="object-cover"
+                  ></AvatarImage>
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              </PopoverTrigger>
+              <PopoverContent className="px-2 w-50">
+                <div className="grid gap-4">
+                  <div className="space-y-2 hover:bg-slate-100">
+                    <h4 className="font-medium leading-none">{user?.email}</h4>
+                    {/* <p className="text-sm text-muted-foreground">Student</p> */}
+                    <Separator></Separator>
                   </div>
-                  <div className="flex items-center w-full px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 gap-x-3">
-                    Contribution
-                  </div>
-                  <div className="flex items-center w-full px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 gap-x-3">
-                    Liked Contribution
-                  </div>
-                  <div className="flex items-center w-full px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 gap-x-3">
-                    Logout
+                  <div className="gap-2 text-slate-700 font-medium">
+                    <div className="flex items-center w-full px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 gap-x-3">
+                      My Profile
+                    </div>
+                    <div
+                      className="flex items-center w-full px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 gap-x-3"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </div>
                   </div>
                 </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+              </PopoverContent>
+            </Popover>
+          )}
+          {!isAuth && (
+            <Popover>
+              <PopoverTrigger asChild className="cursor-pointer">
+                <Avatar className="border-2">
+                  <AvatarImage
+                    src="https://www.transparentpng.com/download/user/gray-user-profile-icon-png-fP8Q1P.png"
+                    className="object-cover"
+                  ></AvatarImage>
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              </PopoverTrigger>
+              <PopoverContent className="px-2 max-w-[150px]">
+                <Link
+                  href="signup"
+                  className="gap-2 text-slate-700 font-medium"
+                >
+                  <div className="flex items-center justify-center  px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 gap-x-3">
+                    Sign Up
+                  </div>
+                  <Separator></Separator>
+                </Link>
+                <Link href="login" className="gap-2 text-slate-700 font-medium">
+                  <div className="flex items-center justify-center  px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 gap-x-3">
+                    Login
+                  </div>
+                </Link>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
       </nav>
     </header>

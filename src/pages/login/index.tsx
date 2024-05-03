@@ -2,27 +2,87 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
 import * as yup from "yup";
 import LoginThumb from "../../../public/login-thumb.jpg";
 import Logo from "../../../public/logo.png";
+import { EMAIL_REG, PASSWORD_REG } from "@/utils/regex";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useRouter } from "next/router";
+import { useMutation } from "@tanstack/react-query";
+import { TLogin, User } from "@/@types/auth.type";
+import { login } from "@/services/auth.services";
+import { toast } from "react-toastify";
+import type { AxiosError } from "axios";
+type TDefaultValue = {
+  email: string;
+  password: string;
+};
+import {
+  saveAccessTokenToLS,
+  saveRefreshTokenToLS,
+  saveUserToLS,
+} from "@/utils/auth";
+import { useAppContext } from "@/context/app.context";
+
 export default function Login() {
+  const { setIsAuth, setUser } = useAppContext();
+  const router = useRouter();
+  // Mutation
+  const loginMutation = useMutation({
+    mutationFn: (data: TLogin) => login(data),
+  });
   // React-Hook-Forms
+  const schema = yup.object().shape({
+    email: yup
+      .string()
+      .required("Required_field")
+      .matches(EMAIL_REG, "Rules_email"),
+    password: yup
+      .string()
+      .required("Required_field")
+      .matches(PASSWORD_REG, "Rules_password"),
+  });
+
+  const defaultValues: TDefaultValue = {
+    email: "admin@gmail.com",
+    password: "123456789Kha@",
+  };
+
   const {
-    register,
     handleSubmit,
     control,
-    watch,
     formState: { errors },
-  } = useForm();
+    setError,
+  } = useForm({
+    defaultValues,
+    mode: "onBlur",
+    resolver: yupResolver(schema),
+  });
 
+  const onSubmit = (data: { email: string; password: string }) => {
+    loginMutation.mutate(data, {
+      onSuccess(data) {
+        let currenData = data?.data?.data;
+        saveAccessTokenToLS(currenData?.access_token as string);
+        saveRefreshTokenToLS(currenData?.refresh_token as string);
+        saveUserToLS(currenData?.user as User);
+        setIsAuth(true);
+        setUser(currenData?.user as User);
+        router.push("/");
+        toast.success("Login Successfully!");
+      },
+      onError(err: any) {
+        if (err?.response?.data?.typeError === "INVALID")
+          toast.error("The email or password wrong");
+      },
+    });
+  };
   //State
   const [isOpen, setIsOpen] = useState(false);
   const isLoading = false;
-
-  const onSubmit = () => {};
   return (
     <div className="fixed grid w-screen h-screen grid-cols-2 gap-x-6">
       {/* Left */}
@@ -46,18 +106,35 @@ export default function Login() {
         <h2 className="mt-12 text-xl font-semibold">Nice to see you again!</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="my-6">
-            <Input
-              className="p-6 outline-none text-lg"
-              placeholder="User Email"
-            ></Input>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field }) => (
+                <Input
+                  className="px-4 py-6 outline-none text-sm"
+                  placeholder="User Email"
+                  {...field}
+                ></Input>
+              )}
+            />
+            <div className="my-2 text-red-500 text-sm font-medium">
+              {errors?.email && errors?.email?.message}
+            </div>
           </div>
           <div className="my-6">
             <div className="relative">
-              <Input
-                className="p-6 outline-none text-lg"
-                placeholder="Password"
-                type={isOpen ? "text" : "password"}
-              ></Input>
+              <Controller
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <Input
+                    className="px-4 py-6 outline-none text-sm"
+                    placeholder="Password"
+                    type={isOpen ? "text" : "password"}
+                    {...field}
+                  ></Input>
+                )}
+              />
               <div
                 className="absolute -translate-y-1/2 top-[50%] w-5 h-5 cursor-pointer right-5"
                 onClick={() => setIsOpen(!isOpen)}
@@ -68,6 +145,9 @@ export default function Login() {
                   <Icon icon="mdi:eye" className="w-full h-full"></Icon>
                 )}
               </div>
+            </div>
+            <div className="my-2 text-red-500 text-sm font-medium">
+              {errors?.password && errors?.password?.message}
             </div>
           </div>
           <div className="flex justify-between">

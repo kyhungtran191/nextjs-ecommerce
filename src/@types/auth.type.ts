@@ -16,3 +16,8 @@ export type Role = {
   name: string;
   permissions: string[];
 };
+
+export type TLogin = {
+  email: string;
+  password: string;
+};
