@@ -9,7 +9,7 @@ import type { AppProps } from "next/app";
 // ** Store Imports
 
 // ** Loader Import
-
+import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 // ** Config Imports
 import GuestGuard from "@/components/auth/GuestGuard";
 import FallbackSpinner from "@/components/FallbackSpinner";
@@ -22,6 +22,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Poppins } from "next/font/google";
 import GeneralLayout from "@/layout/GeneralLayout";
+import Router from "next/router";
+import { AppContextProvider } from "@/context/app.context";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { AxiosInterceptor } from "@/configs/axiosInstance";
 // ** Contexts
 
 // ** Global css styles
@@ -78,15 +83,26 @@ export default function App(props: ExtendedAppProps) {
       </Head>
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools initialIsOpen={false} />
-        <Guard authGuard={authGuard} guestGuard={guestGuard}>
-          <AclGuard
-            aclAbilities={aclAbilities}
-            guestGuard={guestGuard}
-            authGuard={authGuard}
-          >
-            {getLayout(<Component {...pageProps} />)}
-          </AclGuard>
-        </Guard>
+        <ToastContainer></ToastContainer>
+        <AppContextProvider>
+          <AxiosInterceptor>
+            <Guard authGuard={authGuard} guestGuard={guestGuard}>
+              <AclGuard
+                aclAbilities={aclAbilities}
+                guestGuard={guestGuard}
+                authGuard={authGuard}
+              >
+                {getLayout(<Component {...pageProps} />)}
+                <ProgressBar
+                  height="2px"
+                  color="purple"
+                  options={{ showSpinner: false }}
+                  shallowRouting
+                />
+              </AclGuard>
+            </Guard>
+          </AxiosInterceptor>
+        </AppContextProvider>
       </QueryClientProvider>
     </main>
   );

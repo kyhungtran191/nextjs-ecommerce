@@ -7,8 +7,8 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Icon } from "@iconify/react";
 import * as yup from "yup";
-import LoginThumb from "../../public/login-thumb.jpg";
-import Logo from "../../public/logo.png";
+import LoginThumb from "../../../public/login-thumb.jpg";
+import Logo from "../../../public/logo.png";
 
 export default function SignUp() {
   // React-Hook-Forms

@@ -6,9 +6,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
+import { toast } from "react-toastify";
 
 export default function Header() {
+
   return (
     <header className="h-[72px] w-full sticky top-0 left-0 right-0 shadow-md z-30 bg-white text-black ">
       <nav className="container h-full flex justify-between items-center leading-[72px] relative">
