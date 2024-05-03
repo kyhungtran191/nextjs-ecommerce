@@ -1,10 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { MainNav } from "./MainNav";
 import { Search } from "./Search";
 import { UserNav } from "./UserNav";
 import MenuMobile from "./MenuMobile";
+import { toast } from "react-toastify";
 
 export default function Header() {
+  useEffect(() => {
+    toast.success("Success");
+  }, []);
   return (
     <div className="border-b">
       <div className="flex h-16 items-center px-4">

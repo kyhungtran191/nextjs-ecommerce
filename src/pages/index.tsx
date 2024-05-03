@@ -9,9 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useAppContext } from "@/context/app.context";
 // const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const { isAuth } = useAppContext();
   return (
     <AdminDashboard>
       <Table>
