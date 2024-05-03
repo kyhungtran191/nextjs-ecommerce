@@ -49,14 +49,14 @@ export default function SignUp() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="my-6">
             <Input
-              className="p-6 outline-none text-lg"
+              className="p-6 outline-none text-sm"
               placeholder="User Email"
             ></Input>
           </div>
           <div className="my-6">
             <div className="relative">
               <Input
-                className="p-6 outline-none text-lg"
+                className="p-6 outline-none text-sm"
                 placeholder="Password"
                 type={isOpen ? "text" : "password"}
               ></Input>
@@ -75,7 +75,7 @@ export default function SignUp() {
           <div className="my-6">
             <div className="relative">
               <Input
-                className="p-6 outline-none text-lg"
+                className="p-6 outline-none text-sm"
                 placeholder="Confirm password"
                 type={isOpen ? "text" : "password"}
               ></Input>

@@ -1,5 +1,5 @@
 import { User } from "@/@types/auth.type";
-import { getAccessTokenFromLS } from "@/utils/auth";
+import { getAccessTokenFromLS, getUserFromLS } from "@/utils/auth";
 import {
   createContext,
   Dispatch,
@@ -9,17 +9,17 @@ import {
 } from "react";
 
 type AppContextType = {
-  user: User | {};
+  user: User | undefined;
   isAuth: boolean;
   setIsAuth: Dispatch<SetStateAction<boolean>>;
-  setUser: Dispatch<SetStateAction<{} | User>>;
+  setUser: Dispatch<SetStateAction<User | undefined>>;
 };
 
 const initialAppContext: AppContextType = {
   isAuth: Boolean(getAccessTokenFromLS()),
   setIsAuth: () => {},
   setUser: () => {},
-  user: {},
+  user: getUserFromLS(),
 };
 export const AppContext = createContext(initialAppContext);
 
@@ -35,7 +35,7 @@ export const AppContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [user, setUser] = useState<User | {}>({});
+  const [user, setUser] = useState<User | undefined>(initialAppContext.user);
   const [isAuth, setIsAuth] = useState(Boolean(getAccessTokenFromLS()));
 
   return (

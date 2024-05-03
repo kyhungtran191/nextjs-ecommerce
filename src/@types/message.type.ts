@@ -1,6 +1,6 @@
-export type Response<Data> = {
+export type ResponseData<Data> = {
   typeError: string;
-  data: Data | null;
+  data?: Data | null;
   message: string;
   status: string;
 };

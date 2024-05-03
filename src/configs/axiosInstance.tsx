@@ -73,7 +73,7 @@ const AxiosInterceptor = ({ children }: { children: React.ReactNode }) => {
               .catch((error) => {
                 toast.error("Refresh Token Timeout!");
                 clearLS();
-                setUser({});
+                setUser(undefined);
                 setIsAuth(false);
                 queryClient.clear();
                 return router.replace("/login");
@@ -91,7 +91,7 @@ const AxiosInterceptor = ({ children }: { children: React.ReactNode }) => {
         } else {
           console.log(1);
           clearLS();
-          setUser({});
+          setUser(undefined);
           setIsAuth(false);
           queryClient.clear();
           return router.replace("/login");
