@@ -28,6 +28,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AxiosInterceptor } from "@/configs/axiosInstance";
 import { ThemeProvider } from "@/components/theme-provider";
+import Fallback from "@/components/Spinner";
 // ** Contexts
 
 // ** Global css styles
@@ -44,11 +45,11 @@ type GuardProps = {
 
 const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
   if (guestGuard) {
-    return <GuestGuard fallback={<FallbackSpinner />}>{children}</GuestGuard>;
+    return <GuestGuard>{children}</GuestGuard>;
   } else if (!guestGuard && !authGuard) {
     return <>{children}</>;
   } else {
-    return <AuthGuard fallback={<FallbackSpinner />}>{children}</AuthGuard>;
+    return <AuthGuard>{children}</AuthGuard>;
   }
 };
 // Font family
@@ -62,7 +63,7 @@ export default function App(props: ExtendedAppProps) {
 
   const getLayout = Component.getLayout ?? ((page) => <>{page}</>);
 
-  const authGuard = Component.authGuard ?? true;
+  const authGuard = Component.authGuard ?? false;
 
   const guestGuard = Component.guestGuard ?? false;
 
@@ -84,7 +85,7 @@ export default function App(props: ExtendedAppProps) {
       </Head>
       <ThemeProvider
         attribute="class"
-        defaultTheme="light"
+        defaultTheme="system"
         enableSystem
         disableTransitionOnChange
       >

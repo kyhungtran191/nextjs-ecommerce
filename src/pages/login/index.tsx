@@ -72,7 +72,9 @@ export default function Login() {
         setIsAuth(true);
         setUser(currenData?.user as User);
         toast.success("Login Successfully!");
-        router.push("/");
+        const returnUrl = router.query.returnUrl;
+        const redirectURL = returnUrl && returnUrl !== "/" ? returnUrl : "/";
+        router.replace(redirectURL as string);
       },
       onError(err: any) {
         if (err?.response?.data?.typeError === "INVALID")
@@ -174,3 +176,4 @@ export default function Login() {
     </div>
   );
 }
+Login.guestGuard = true;
