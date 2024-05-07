@@ -12,6 +12,12 @@ export type ResponseLogin = {
   message: string;
   status: string;
 };
+
 export const login = (data: TLogin) =>
   axios.post<ResponseData<ResponseLogin>>(AuthAPI.login, data);
+
+export const register = (data: TLogin) => {
+  return axios.post<ResponseData<ResponseLogin>>(AuthAPI.register, data);
+};
+
 export const logout = () => instanceAxios.post<{}>(AuthAPI.logout);
