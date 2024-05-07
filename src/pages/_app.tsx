@@ -27,6 +27,7 @@ import { AppContextProvider } from "@/context/app.context";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AxiosInterceptor } from "@/configs/axiosInstance";
+import { ThemeProvider } from "@/components/theme-provider";
 // ** Contexts
 
 // ** Global css styles
@@ -81,29 +82,36 @@ export default function App(props: ExtendedAppProps) {
       <Head>
         <title>HShop</title>
       </Head>
-      <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools initialIsOpen={false} />
-        <ToastContainer></ToastContainer>
-        <AppContextProvider>
-          <AxiosInterceptor>
-            <Guard authGuard={authGuard} guestGuard={guestGuard}>
-              <AclGuard
-                aclAbilities={aclAbilities}
-                guestGuard={guestGuard}
-                authGuard={authGuard}
-              >
-                {getLayout(<Component {...pageProps} />)}
-                <ProgressBar
-                  height="2px"
-                  color="purple"
-                  options={{ showSpinner: false }}
-                  shallowRouting
-                />
-              </AclGuard>
-            </Guard>
-          </AxiosInterceptor>
-        </AppContextProvider>
-      </QueryClientProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools initialIsOpen={false} />
+          <ToastContainer></ToastContainer>
+          <AppContextProvider>
+            <AxiosInterceptor>
+              <Guard authGuard={authGuard} guestGuard={guestGuard}>
+                <AclGuard
+                  aclAbilities={aclAbilities}
+                  guestGuard={guestGuard}
+                  authGuard={authGuard}
+                >
+                  {getLayout(<Component {...pageProps} />)}
+                  <ProgressBar
+                    height="2px"
+                    color="purple"
+                    options={{ showSpinner: false }}
+                    shallowRouting
+                  />
+                </AclGuard>
+              </Guard>
+            </AxiosInterceptor>
+          </AppContextProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </main>
   );
 }

@@ -71,8 +71,8 @@ export default function Login() {
         saveUserToLS(currenData?.user as User);
         setIsAuth(true);
         setUser(currenData?.user as User);
-        router.push("/");
         toast.success("Login Successfully!");
+        router.push("/");
       },
       onError(err: any) {
         if (err?.response?.data?.typeError === "INVALID")
