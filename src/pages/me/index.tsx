@@ -2,6 +2,7 @@ import DatePickerCustom from "@/components/DatePickerCustom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import GeneralLayout from "@/layout/GeneralLayout";
 import AdminDashboard from "@/layout/partials/admin/AdminLayout";
 import React from "react";
 
@@ -16,7 +17,7 @@ export default function Profile() {
             className="w-[80px] h-[80px] rounded-full  border-black mx-auto hover:bg-black object-cover"
           />
           <input type="file" className="hidden" id="image" />
-          <div className="mt-5 font-semibold text-center">Avatar</div>
+          {/* <div className="mt-5 font-semibold text-center">Avatar</div> */}
         </label>
         <form className="grid items-start justify-center grid-cols-2 gap-5">
           <div className="col-span-2 sm:col-span-1">
@@ -89,3 +90,5 @@ export default function Profile() {
     </>
   );
 }
+
+Profile.authGuard = true;
