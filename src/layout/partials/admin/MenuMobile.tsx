@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/sheet";
 import { AlignJustify } from "lucide-react";
 import { useRouter } from "next/router";
+import DropdownMenu from "@/components/DropdownMenu";
+import { menuAdmin } from "@/configs/menuAdmins";
 interface IProps {
   className: string;
 }
@@ -27,9 +29,10 @@ export default function MenuMobile({ className }: IProps) {
         </SheetTrigger>
         <SheetContent side={"left"}>
           <SheetHeader>
-            <SheetTitle>Discover</SheetTitle>
+            <SheetTitle></SheetTitle>
           </SheetHeader>
           {/* Sidebar options here */}
+          <DropdownMenu items={menuAdmin}></DropdownMenu>
           <SheetFooter>
             <SheetClose asChild></SheetClose>
           </SheetFooter>
