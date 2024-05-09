@@ -24,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 export default function Header() {
   const { setTheme } = useTheme();
   const { setIsAuth, setUser, user, isAuth } = useAppContext();
