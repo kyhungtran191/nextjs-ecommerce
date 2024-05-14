@@ -14,8 +14,8 @@ import {
   saveAccessTokenToLS,
   saveRefreshTokenToLS,
 } from "@/utils/auth";
-import { URL } from "@/apis/auth.api";
 import { toast } from "react-toastify";
+import { URL } from "@/apis";
 const instanceAxios = axios.create({
   baseURL: URL,
 });

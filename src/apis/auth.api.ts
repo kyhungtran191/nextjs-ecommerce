@@ -1,4 +1,4 @@
-export const URL = "http://localhost:3001/api";
+import { URL } from ".";
 
 export const AuthAPI = {
   login: `${URL}/auth/login`,
