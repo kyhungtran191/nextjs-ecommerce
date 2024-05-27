@@ -8,7 +8,8 @@ export type RoleData = {
   updatedAt: string;
 };
 
-export type RoleDataList = RoleData & {
+export type RoleDataList = {
+  roles: RoleData[];
   totalPage: string;
   totalCount: string;
 };

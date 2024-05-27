@@ -16,7 +16,6 @@ type TDropdownItem = {
 };
 export default function DropdownMenu({ items }: { items: TDropdownItem[] }) {
   const router = useRouter();
-  console.log(router);
   const handleClickItem = (item: TDropdownItem) => {
     if (item.children) return;
     router.push(item.link);
