@@ -33,7 +33,12 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createRole, getAllRole, updateRole } from "@/services/role.services";
+import {
+  createRole,
+  getAllRole,
+  getDetailRole,
+  updateRole,
+} from "@/services/role.services";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
@@ -51,6 +56,9 @@ export default function RolePage() {
   const schema = yup.object().shape({
     role_name: yup.string().required("This field is required"),
   });
+
+  // Handle fetch detail role
+
   const {
     handleSubmit,
     control,
@@ -61,11 +69,17 @@ export default function RolePage() {
   } = useForm({
     resolver: yupResolver(schema),
   });
+
   // Mutation
   const [selectedRow, setSelectedRow] = useState<RoleData | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [roleData, setRoleData] = useState<RoleData[] | []>([]);
   const [isEdit, setIsEdit] = useState("");
+  const [permissions, setPermissions] = useState<string[]>([
+    "MANAGE_PRODUCT.PRODUCT.VIEW",
+    "MANAGE_PRODUCT.PRODUCT.CREATE",
+    "MANAGE_PRODUCT.PRODUCT.UPDATE",
+  ]);
   // Fetch Role Data
   const roleQueryData = useQuery({
     queryKey: ["roles"],
@@ -73,6 +87,13 @@ export default function RolePage() {
     staleTime: 10 * (60 * 1000),
     cacheTime: 15 * (60 * 1000),
   });
+  // Fetch Detail Role Information
+  const queryDetailRole = useQuery({
+    queryKey: ["role_detail", selectedRow?._id],
+    queryFn: () => getDetailRole(selectedRow?._id as string),
+    enabled: Boolean(selectedRow),
+  });
+
   // Mutate update Role
   const updateRoleMutation = useMutation({
     mutationFn: (body: { name?: string; permissions?: string[]; id: string }) =>
@@ -127,11 +148,18 @@ export default function RolePage() {
       );
     }
   };
+
   useEffect(() => {
-    if (roleQueryData) {
+    if (queryDetailRole.data?.data.data?.permissions) {
+      setPermissions(queryDetailRole.data?.data.data?.permissions);
+    }
+  }, [queryDetailRole.data]);
+
+  useEffect(() => {
+    if (roleQueryData.data) {
       setRoleData(roleQueryData.data?.data.data?.roles || []);
     }
-  }, [roleQueryData]);
+  }, [roleQueryData.data]);
   // Column role
   const columns = [
     {
@@ -186,7 +214,6 @@ export default function RolePage() {
       enableHiding: false,
     },
   ];
-  // const data = [{ name: "Role 1", action: "1" }];
 
   // RoleTable
   const roleTable = useReactTable({
@@ -307,13 +334,18 @@ export default function RolePage() {
         </Table>
       </div>
       {/* Table Permissions */}
-      <div className="col-span-3 sm:col-span-2">
-        <h2 className="my-2 font-semibold">Permissions With Role</h2>
-        <PermissionTable
-          permissions={["1"]}
-          setPermissions={() => {}}
-        ></PermissionTable>
-      </div>
+      {selectedRow && (
+        <div className="col-span-3 sm:col-span-2">
+          <div className="flex items-center justify-between">
+            <h2 className="my-2 font-semibold">Permissions With Role</h2>
+            <Button className="bg-purple text-white">Update Permissions</Button>
+          </div>
+          <PermissionTable
+            permissions={permissions}
+            setPermissions={setPermissions}
+          ></PermissionTable>
+        </div>
+      )}
     </div>
   );
 }

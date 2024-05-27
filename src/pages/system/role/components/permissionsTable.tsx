@@ -12,23 +12,50 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { LIST_DATA_PERMISSIONS } from "@/configs/permission";
+import { LIST_DATA_PERMISSIONS, PERMISSIONS } from "@/configs/permission";
 import { Checkbox } from "@/components/ui/checkbox";
 
 type TProps = {
   permissions: string[];
-  setPermissions: () => void;
+  setPermissions: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 export default function PermissionTable({
   permissions,
   setPermissions,
 }: TProps) {
+  // return string from const value list
+  const getValuePermission = (
+    parentValue: string,
+    value: string,
+    mode: string
+  ) => {
+    try {
+      return PERMISSIONS[parentValue][value][mode];
+    } catch (err) {
+      return "";
+    }
+  };
+
+  // Check onChange event
+  const handleOnChangeCheckBox = (value: string) => {
+    const isChecked = permissions.includes(value);
+    if (isChecked) {
+      let newArr = permissions.filter((item) => item !== value);
+      setPermissions(newArr);
+    } else {
+      setPermissions((prev) => [...prev, value]);
+    }
+  };
+
   const columns = [
     {
       id: "all",
       header: () => <div className="flex items-center gap-2">All</div>,
       cell: ({ row }: { row: any }) => {
+        if(row.original.isParent){
+          console.log(row.original)
+        }
         return (
           !row.original.isHideAll && (
             <Checkbox value={row.original.value}></Checkbox>
@@ -64,8 +91,22 @@ export default function PermissionTable({
         return (
           !(row.original.isHideView || row.original.isParent) && (
             <Checkbox
-              value={row.original.value}
+              value={getValuePermission(
+                row.original.parentValue,
+                row.original.value,
+                "VIEW"
+              )}
               className="text-center"
+              onClick={(e) => {
+                handleOnChangeCheckBox((e.target as HTMLInputElement).value);
+              }}
+              // checked={permissions.includes(
+              //   getValuePermission(
+              //     row.original.parentValue,
+              //     row.original.value,
+              //     "VIEW"
+              //   )
+              // )}
             ></Checkbox>
           )
         );
@@ -81,7 +122,23 @@ export default function PermissionTable({
       cell: ({ row }: { row: any }) => {
         return (
           !(row.original.isHideCreate || row.original.isParent) && (
-            <Checkbox value={row.original.value}></Checkbox>
+            <Checkbox
+              value={getValuePermission(
+                row.original.parentValue,
+                row.original.value,
+                "CREATE"
+              )}
+              onClick={(e) => {
+                handleOnChangeCheckBox((e.target as HTMLInputElement).value);
+              }}
+              // checked={permissions.includes(
+              //   getValuePermission(
+              //     row.original.parentValue,
+              //     row.original.value,
+              //     "CREATE"
+              //   )
+              // )}
+            ></Checkbox>
           )
         );
       },
@@ -91,12 +148,28 @@ export default function PermissionTable({
       maxSize: 50,
     },
     {
-      id: "edit",
-      header: () => <p>Edit</p>,
+      id: "update",
+      header: () => <p>Update</p>,
       cell: ({ row }: { row: any }) => {
         return (
           !(row.original.isHideUpdate || row.original.isParent) && (
-            <Checkbox value={row.original.value}></Checkbox>
+            <Checkbox
+              value={getValuePermission(
+                row.original.parentValue,
+                row.original.value,
+                "UPDATE"
+              )}
+              onClick={(e) => {
+                handleOnChangeCheckBox((e.target as HTMLInputElement).value);
+              }}
+              // checked={permissions.includes(
+              //   getValuePermission(
+              //     row.original.parentValue,
+              //     row.original.value,
+              //     "UPDATE"
+              //   )
+              // )}
+            ></Checkbox>
           )
         );
       },
@@ -111,7 +184,23 @@ export default function PermissionTable({
       cell: ({ row }: { row: any }) => {
         return (
           !(row.original.isHideDelete || row.original.isParent) && (
-            <Checkbox value={row.original.value}></Checkbox>
+            <Checkbox
+              value={getValuePermission(
+                row.original.parentValue,
+                row.original.value,
+                "DELETE"
+              )}
+              onClick={(e) => {
+                handleOnChangeCheckBox((e.target as HTMLInputElement).value);
+              }}
+              // checked={permissions.includes(
+              //   getValuePermission(
+              //     row.original.parentValue,
+              //     row.original.value,
+              //     "DELETE"
+              //   )
+              // )}
+            ></Checkbox>
           )
         );
       },
@@ -121,11 +210,14 @@ export default function PermissionTable({
       maxSize: 50,
     },
   ];
+
   const permissionTable = useReactTable({
     data: LIST_DATA_PERMISSIONS,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
+  console.log(permissions);
   return (
     <div className="h-[700px] overflow-y-auto p-4">
       <Table className="border">

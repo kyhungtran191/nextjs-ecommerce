@@ -21,11 +21,7 @@ export const updateRole = async (body: {
   );
 };
 export const getDetailRole = async (id: string) =>
-  await instanceAxios.get<ResponseData<RoleData>>(`${RoleAPI.ROLE}`, {
-    params: {
-      roleId: id,
-    },
-  });
+  await instanceAxios.get<ResponseData<RoleData>>(`${RoleAPI.ROLE}/${id}`);
 
 // Define delete one
 // Define delete all
