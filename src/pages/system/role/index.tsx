@@ -37,6 +37,7 @@ import { createRole, getAllRole, updateRole } from "@/services/role.services";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
+import PermissionTable from "./components/permissionsTable";
 
 type RoleData = {
   _id: string;
@@ -194,7 +195,7 @@ export default function RolePage() {
     getCoreRowModel: getCoreRowModel(),
   });
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-3 gap-5">
       {/* Table Role  */}
       <div className="col-span-3 sm:col-span-1">
         <div className="flex items-center gap-2 w-full">
@@ -247,7 +248,8 @@ export default function RolePage() {
           </Dialog>
         </div>
         {/* Table Role */}
-        <Table className="border mt-5">
+        <h2 className="my-2 font-semibold">Role Manage</h2>
+        <Table className="border">
           <TableHeader>
             {roleTable.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -305,7 +307,13 @@ export default function RolePage() {
         </Table>
       </div>
       {/* Table Permissions */}
-      <div className="col-span-3 sm:col-span-2"></div>
+      <div className="col-span-3 sm:col-span-2">
+        <h2 className="my-2 font-semibold">Permissions With Role</h2>
+        <PermissionTable
+          permissions={["1"]}
+          setPermissions={() => {}}
+        ></PermissionTable>
+      </div>
     </div>
   );
 }
