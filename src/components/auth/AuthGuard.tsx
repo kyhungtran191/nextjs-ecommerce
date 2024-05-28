@@ -4,7 +4,7 @@ import { useAppContext } from "@/context/app.context";
 import Login from "@/pages/login";
 import { useRouter } from "next/router";
 import { ReactNode, ReactElement, useEffect, useState } from "react";
-import Spinner from "../Spinner";
+import ComponentsLoading from "../loading/ComponentsLoading";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -27,7 +27,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
   return (
     <>
-      {loader && <Spinner></Spinner>}
+      {loader && <ComponentsLoading></ComponentsLoading>}
       {!loader && children}
     </>
   );

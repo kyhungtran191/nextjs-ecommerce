@@ -28,7 +28,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AxiosInterceptor } from "@/configs/axiosInstance";
 import { ThemeProvider } from "@/components/theme-provider";
-import Fallback from "@/components/Spinner";
+import Fallback from "@/components/loading/ComponentsLoading";
 // ** Contexts
 
 // ** Global css styles

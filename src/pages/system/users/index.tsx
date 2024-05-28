@@ -1,9 +1,9 @@
 import AdminDashboard from "@/layout/partials/admin/AdminLayout";
 import React, { ReactNode } from "react";
 
-export default function Users() {
-  return <div>Users</div>;
+export default function UserPage() {
+  return <div>User Page</div>;
 }
-Users.getLayout = (page: ReactNode) => (
+UserPage.getLayout = (page: ReactNode) => (
   <AdminDashboard>{page}</AdminDashboard>
 );

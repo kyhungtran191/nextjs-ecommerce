@@ -1,9 +1,9 @@
 import AdminDashboard from "@/layout/partials/admin/AdminLayout";
 import React, { ReactNode } from "react";
 
-export default function ManageIndex() {
-  return <div>ManageIndex</div>;
+export default function PaymentPage() {
+  return <div>PaymentPage</div>;
 }
-ManageIndex.getLayout = (page: ReactNode) => (
+PaymentPage.getLayout = (page: ReactNode) => (
   <AdminDashboard>{page}</AdminDashboard>
 );
