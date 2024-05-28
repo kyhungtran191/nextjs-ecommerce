@@ -56,7 +56,7 @@ export default function PermissionTable({
       ? getAllValueOfObject(PERMISSIONS[parentValues][value])
       : getAllValueOfObject(PERMISSIONS[value]);
 
-    let isCheckAll = allValue.every((item) => permissions.includes(item));
+    let isCheckAll = allValue.every((item) => permissions?.includes(item));
     return {
       isCheckAll,
       allValue,
@@ -68,7 +68,7 @@ export default function PermissionTable({
     const { isCheckAll, allValue } = handleCheckIsCheckAll(value, parentValues);
     // isCheckAll -> filter ra
     if (isCheckAll) {
-      let newArr = permissions.filter((item) => !allValue.includes(item));
+      let newArr = permissions.filter((item) => !allValue?.includes(item));
       setPermissions(newArr);
     } else {
       allValue.forEach((item) => permissions.push(item));
