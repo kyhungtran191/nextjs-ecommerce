@@ -80,7 +80,6 @@ export const getAllValueOfObject = (obj: any, arrExlude?: string[]) => {
         }
       }
     }
-
     return values;
   } catch (error) {
     return [];

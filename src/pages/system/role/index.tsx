@@ -1,7 +1,13 @@
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { Search } from "@/components/Search";
 import AdminDashboard from "@/layout/partials/admin/AdminLayout";
 import { LockKeyhole, Plus, Pencil, Trash2 } from "lucide-react";
-import React, { ReactNode, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
   Table,
@@ -27,9 +33,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -43,6 +46,8 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Controller, useForm } from "react-hook-form";
 import PermissionTable from "./components/permissionsTable";
+import { PERMISSIONS } from "@/configs/permission";
+import { getAllValueOfObject } from "@/utils/helper";
 
 type RoleData = {
   _id: string;
@@ -52,106 +57,111 @@ type RoleData = {
 
 export default function RolePage() {
   const queryClient = useQueryClient();
-  // React Hook Validation
-  const schema = yup.object().shape({
-    role_name: yup.string().required("This field is required"),
-  });
-
-  // Handle fetch detail role
-
-  const {
-    handleSubmit,
-    control,
-    formState: { errors },
-    setError,
-    clearErrors,
-    reset,
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
-
-  // Mutation
   const [selectedRow, setSelectedRow] = useState<RoleData | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [roleData, setRoleData] = useState<RoleData[] | []>([]);
+  const [roleData, setRoleData] = useState<RoleData[]>([]);
   const [isEdit, setIsEdit] = useState("");
   const [permissions, setPermissions] = useState<string[]>([
     "MANAGE_PRODUCT.PRODUCT.VIEW",
     "MANAGE_PRODUCT.PRODUCT.CREATE",
     "MANAGE_PRODUCT.PRODUCT.UPDATE",
   ]);
-  // Fetch Role Data
+
+  const schema = yup.object().shape({
+    role_name: yup.string().required("This field is required"),
+  });
+
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
   const roleQueryData = useQuery({
     queryKey: ["roles"],
     queryFn: getAllRole,
     staleTime: 10 * (60 * 1000),
     cacheTime: 15 * (60 * 1000),
   });
-  // Fetch Detail Role Information
+
   const queryDetailRole = useQuery({
     queryKey: ["role_detail", selectedRow?._id],
     queryFn: () => getDetailRole(selectedRow?._id as string),
     enabled: Boolean(selectedRow),
   });
 
-  // Mutate update Role
   const updateRoleMutation = useMutation({
     mutationFn: (body: { name?: string; permissions?: string[]; id: string }) =>
       updateRole(body),
   });
+
   const createRoleMutation = useMutation({
     mutationFn: (body: { name: string }) => createRole(body),
   });
-  // Edit Role Function
-  const handleEdit = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    row: RoleData
-  ) => {
-    e.stopPropagation();
-    setSelectedRow(row);
-    reset({ role_name: row?.name });
-    setIsEdit(row._id);
-    setOpenDialog(true);
-  };
-  // Add & Edit Role Function
-  const handleForm = (data: { role_name: string }) => {
-    if (isEdit) {
-      updateRoleMutation.mutate(
-        { name: data.role_name, id: isEdit },
-        {
-          onSuccess(data) {
-            toast.success(data.data.message);
-            queryClient.invalidateQueries(["roles"]);
-            reset({ role_name: "" });
-            setIsEdit("");
-            setOpenDialog(false);
-          },
-          onError(data: any) {
-            toast.error(data.response.data.message);
-          },
-        }
-      );
-    } else {
-      createRoleMutation.mutate(
-        { name: data.role_name },
-        {
-          onSuccess(data) {
-            toast.success(data.data.message);
-            queryClient.invalidateQueries(["roles"]);
-            reset({ role_name: "" });
-            setOpenDialog(false);
-          },
-          onError(data: any) {
-            toast.error(data.data.message);
-          },
-        }
-      );
-    }
-  };
+
+  const handleEdit = useCallback(
+    (e: React.MouseEvent<HTMLDivElement, MouseEvent>, row: RoleData) => {
+      e.stopPropagation();
+      setSelectedRow(row);
+      reset({ role_name: row?.name });
+      setIsEdit(row._id);
+      setOpenDialog(true);
+    },
+    [reset]
+  );
+
+  const handleForm = useCallback(
+    (data: { role_name: string }) => {
+      if (isEdit) {
+        updateRoleMutation.mutate(
+          { name: data.role_name, id: isEdit },
+          {
+            onSuccess(data) {
+              toast.success(data.data.message);
+              queryClient.invalidateQueries(["roles"]);
+              reset({ role_name: "" });
+              setIsEdit("");
+              setOpenDialog(false);
+            },
+            onError(data: any) {
+              toast.error(data.response.data.message);
+            },
+          }
+        );
+      } else {
+        createRoleMutation.mutate(
+          { name: data.role_name },
+          {
+            onSuccess(data) {
+              toast.success(data.data.message);
+              queryClient.invalidateQueries(["roles"]);
+              reset({ role_name: "" });
+              setOpenDialog(false);
+            },
+            onError(data: any) {
+              toast.error(data.response.data.message);
+            },
+          }
+        );
+      }
+    },
+    [isEdit, reset, queryClient, updateRoleMutation, createRoleMutation]
+  );
 
   useEffect(() => {
+    // const permissionsData =|| [];
     if (queryDetailRole.data?.data.data?.permissions) {
-      setPermissions(queryDetailRole.data?.data.data?.permissions);
+      if (permissions.includes(PERMISSIONS.ADMIN)) {
+        setPermissions(
+          getAllValueOfObject(PERMISSIONS, [
+            PERMISSIONS.ADMIN,
+            PERMISSIONS.BASIC,
+          ])
+        );
+      }
     }
   }, [queryDetailRole.data]);
 
@@ -160,74 +170,75 @@ export default function RolePage() {
       setRoleData(roleQueryData.data?.data.data?.roles || []);
     }
   }, [roleQueryData.data]);
-  // Column role
-  const columns = [
-    {
-      id: "name",
-      header: () => <p className="">Name</p>,
-      cell: ({ row }: { row: any }) => {
-        return <p className="font-semibold">{row.original.name}</p>;
-      },
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      id: "action",
-      header: () => <p className="text-center">Action</p>,
-      cell: ({ row }: { row: any }) => {
-        return (
-          <div className="flex items-center gap-3 font-base justify-center">
-            {row.original.permissions.includes("ADMIN.GRANTED") ||
-            row.original.permissions.includes("BASIC.PUBLIC") ? (
-              <LockKeyhole
-                className="font-normal  flex-shrink-0 cursor-not-allowed"
-                width={20}
-                height={20}
-              ></LockKeyhole>
-            ) : (
-              <>
-                <div
-                  className="bg-slate-100 p-2 rounded-full hover:bg-slate-200"
-                  onClick={(e) => {
-                    handleEdit(e, row.original);
-                  }}
-                >
-                  <Pencil
-                    className="font-normal cursor-pointer flex-shrink-0 "
-                    width={20}
-                    height={20}
-                  ></Pencil>
-                </div>
-                <div className="bg-slate-100 p-2 rounded-full hover:bg-slate-200">
-                  <Trash2
-                    className="font-normal cursor-pointer flex-shrink-0"
-                    width={20}
-                    height={20}
-                  ></Trash2>
-                </div>
-              </>
-            )}
-          </div>
-        );
-      },
-      enableSorting: false,
-      enableHiding: false,
-    },
-  ];
 
-  // RoleTable
+  const columns = useMemo(
+    () => [
+      {
+        id: "name",
+        header: () => <p className="">Name</p>,
+        cell: ({ row }: { row: any }) => {
+          return <p className="font-semibold">{row.original.name}</p>;
+        },
+        enableSorting: false,
+        enableHiding: false,
+      },
+      {
+        id: "action",
+        header: () => <p className="text-center">Action</p>,
+        cell: ({ row }: { row: any }) => {
+          return (
+            <div className="flex items-center gap-3 font-base justify-center">
+              {row.original.permissions.includes("ADMIN.GRANTED") ||
+              row.original.permissions.includes("BASIC.PUBLIC") ? (
+                <LockKeyhole
+                  className="font-normal  flex-shrink-0 cursor-not-allowed"
+                  width={20}
+                  height={20}
+                ></LockKeyhole>
+              ) : (
+                <>
+                  <div
+                    className="bg-slate-100 p-2 rounded-full hover:bg-slate-200"
+                    onClick={(e) => {
+                      handleEdit(e, row.original);
+                    }}
+                  >
+                    <Pencil
+                      className="font-normal cursor-pointer flex-shrink-0 "
+                      width={20}
+                      height={20}
+                    ></Pencil>
+                  </div>
+                  <div className="bg-slate-100 p-2 rounded-full hover:bg-slate-200">
+                    <Trash2
+                      className="font-normal cursor-pointer flex-shrink-0"
+                      width={20}
+                      height={20}
+                    ></Trash2>
+                  </div>
+                </>
+              )}
+            </div>
+          );
+        },
+        enableSorting: false,
+        enableHiding: false,
+      },
+    ],
+    [handleEdit]
+  );
+
   const roleTable = useReactTable({
     data: roleData,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
   return (
     <div className="grid grid-cols-3 gap-5">
-      {/* Table Role  */}
       <div className="col-span-3 sm:col-span-1">
         <div className="flex items-center gap-2 w-full">
           <Search className="flex-shrink-0"></Search>
-          {/* Add Role Modal */}
           <Dialog open={openDialog} onOpenChange={setOpenDialog}>
             <DialogTrigger>
               <div className="w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center text-white bg-purple cursor-pointer">
@@ -274,7 +285,6 @@ export default function RolePage() {
             </DialogContent>
           </Dialog>
         </div>
-        {/* Table Role */}
         <h2 className="my-2 font-semibold">Role Manage</h2>
         <Table className="border">
           <TableHeader>
@@ -300,7 +310,6 @@ export default function RolePage() {
               roleTable?.getRowModel()?.rows?.map((row) => (
                 <TableRow
                   key={row.id}
-                  // data-state={row.getIsSelected() && "selected"}
                   className={`cursor-pointer ${
                     selectedRow?._id === row.original._id
                       ? "bg-purple  hover:bg-purple"
@@ -333,7 +342,6 @@ export default function RolePage() {
           </TableBody>
         </Table>
       </div>
-      {/* Table Permissions */}
       {selectedRow && (
         <div className="col-span-3 sm:col-span-2">
           <div className="flex items-center justify-between">
