@@ -131,17 +131,17 @@ export const stringToSlug = (str: string) => {
   return str;
 };
 
-export const convertHTMLToDraft = (html: string) => {
-  const blocksFromHtml = htmlToDraft(html);
-  const { contentBlocks, entityMap } = blocksFromHtml;
-  const contentState = ContentState.createFromBlockArray(
-    contentBlocks,
-    entityMap
-  );
-  const editorState = EditorState.createWithContent(contentState);
+// export const convertHTMLToDraft = (html: string) => {
+//   const blocksFromHtml = htmlToDraft(html);
+//   const { contentBlocks, entityMap } = blocksFromHtml;
+//   const contentState = ContentState.createFromBlockArray(
+//     contentBlocks,
+//     entityMap
+//   );
+//   const editorState = EditorState.createWithContent(contentState);
 
-  return editorState;
-};
+//   return editorState;
+// };
 
 export const formatNumberToLocal = (value: string | number) => {
   try {
