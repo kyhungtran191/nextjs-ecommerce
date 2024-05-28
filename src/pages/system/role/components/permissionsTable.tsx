@@ -41,7 +41,7 @@ export default function PermissionTable({
 
   // Check onChange event
   const handleOnChangeCheckBox = (value: string) => {
-    const isChecked = permissions.includes(value);
+    const isChecked = permissions?.includes(value);
     if (isChecked) {
       let newArr = permissions.filter((item) => item !== value);
       setPermissions(newArr);
@@ -100,7 +100,7 @@ export default function PermissionTable({
               onClick={(e) => {
                 handleOnChangeCheckBox((e.target as HTMLInputElement).value);
               }}
-              checked={permissions.includes(value)}
+              checked={permissions?.includes(value)}
             ></Checkbox>
           )
         );
@@ -126,7 +126,7 @@ export default function PermissionTable({
               onClick={(e) => {
                 handleOnChangeCheckBox((e.target as HTMLInputElement).value);
               }}
-              checked={permissions.includes(value)}
+              checked={permissions?.includes(value)}
             ></Checkbox>
           )
         );
@@ -152,7 +152,7 @@ export default function PermissionTable({
               onClick={(e) => {
                 handleOnChangeCheckBox((e.target as HTMLInputElement).value);
               }}
-              checked={permissions.includes(value)}
+              checked={permissions?.includes(value)}
             ></Checkbox>
           )
         );
@@ -178,7 +178,7 @@ export default function PermissionTable({
               onClick={(e) => {
                 handleOnChangeCheckBox((e.target as HTMLInputElement).value);
               }}
-              checked={permissions.includes(value)}
+              checked={permissions?.includes(value)}
             ></Checkbox>
           )
         );

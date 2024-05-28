@@ -151,17 +151,38 @@ export default function RolePage() {
     [isEdit, reset, queryClient, updateRoleMutation, createRoleMutation]
   );
 
+  // Update Permission
+  const handleUpdatePermissions = () => {
+    updateRoleMutation.mutate(
+      { permissions, id: selectedRow?._id as string },
+      {
+        onSuccess(data) {
+          toast.success(data.data.message);
+        },
+        onError(data: any) {
+          toast.error(data.response.data.message);
+        },
+      }
+    );
+  };
+
   useEffect(() => {
-    // const permissionsData =|| [];
-    if (queryDetailRole.data?.data.data?.permissions) {
-      if (permissions.includes(PERMISSIONS.ADMIN)) {
+    const permissionsData = queryDetailRole.data?.data.data?.permissions;
+    if (permissionsData) {
+      if (permissionsData.includes(PERMISSIONS.ADMIN)) {
         setPermissions(
           getAllValueOfObject(PERMISSIONS, [
             PERMISSIONS.ADMIN,
             PERMISSIONS.BASIC,
           ])
         );
+      } else if (permissionsData.includes(PERMISSIONS.BASIC)) {
+        setPermissions([PERMISSIONS.DASHBOARD]);
+      } else {
+        setPermissions(permissionsData || []);
       }
+    } else {
+      setPermissions([]);
     }
   }, [queryDetailRole.data]);
 
@@ -346,7 +367,12 @@ export default function RolePage() {
         <div className="col-span-3 sm:col-span-2">
           <div className="flex items-center justify-between">
             <h2 className="my-2 font-semibold">Permissions With Role</h2>
-            <Button className="bg-purple text-white">Update Permissions</Button>
+            <Button
+              className="bg-purple text-white"
+              onClick={handleUpdatePermissions}
+            >
+              Update Permissions
+            </Button>
           </div>
           <PermissionTable
             permissions={permissions}
