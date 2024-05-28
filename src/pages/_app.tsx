@@ -83,36 +83,29 @@ export default function App(props: ExtendedAppProps) {
       <Head>
         <title>HShop</title>
       </Head>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-      >
-        <QueryClientProvider client={queryClient}>
-          <ReactQueryDevtools initialIsOpen={false} />
-          <ToastContainer></ToastContainer>
-          <AppContextProvider>
-            <AxiosInterceptor>
-              <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                <AclGuard
-                  aclAbilities={aclAbilities}
-                  guestGuard={guestGuard}
-                  authGuard={authGuard}
-                >
-                  {getLayout(<Component {...pageProps} />)}
-                  <ProgressBar
-                    height="2px"
-                    color="purple"
-                    options={{ showSpinner: false }}
-                    shallowRouting
-                  />
-                </AclGuard>
-              </Guard>
-            </AxiosInterceptor>
-          </AppContextProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
+        <ToastContainer></ToastContainer>
+        <AppContextProvider>
+          <AxiosInterceptor>
+            <Guard authGuard={authGuard} guestGuard={guestGuard}>
+              <AclGuard
+                aclAbilities={aclAbilities}
+                guestGuard={guestGuard}
+                authGuard={authGuard}
+              >
+                {getLayout(<Component {...pageProps} />)}
+                <ProgressBar
+                  height="2px"
+                  color="purple"
+                  options={{ showSpinner: false }}
+                  shallowRouting
+                />
+              </AclGuard>
+            </Guard>
+          </AxiosInterceptor>
+        </AppContextProvider>
+      </QueryClientProvider>
     </main>
   );
 }

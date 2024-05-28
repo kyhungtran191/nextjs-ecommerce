@@ -36,7 +36,7 @@ export const AppContextProvider = ({
   children: React.ReactNode;
 }) => {
   const [user, setUser] = useState<User | undefined>(initialAppContext.user);
-  const [isAuth, setIsAuth] = useState(Boolean(getAccessTokenFromLS()));
+  const [isAuth, setIsAuth] = useState(Boolean(user));
 
   return (
     <AppContext.Provider value={{ isAuth, user, setUser, setIsAuth }}>

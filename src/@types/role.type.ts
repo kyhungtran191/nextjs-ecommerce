@@ -4,8 +4,8 @@ export type RoleData = {
   _id: string;
   name: string;
   permissions: string[];
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type RoleDataList = {

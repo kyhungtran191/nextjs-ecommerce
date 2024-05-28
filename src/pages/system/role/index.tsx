@@ -194,7 +194,7 @@ export default function RolePage() {
       setRoleData(roleQueryData.data?.data.data?.roles || []);
     }
   }, [roleQueryData.data]);
-
+  console.log(selectedRow);
   const columns = useMemo(
     () => [
       {
@@ -391,6 +391,7 @@ export default function RolePage() {
             permissions={permissions}
             setPermissions={setPermissions}
             isLoading={queryDetailRole.isLoading}
+            selectedRow={selectedRow}
           ></PermissionTable>
         </div>
       )}
