@@ -15,15 +15,18 @@ import {
 import { LIST_DATA_PERMISSIONS, PERMISSIONS } from "@/configs/permission";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getAllValueOfObject } from "@/utils/helper";
+import ComponentsLoading from "@/components/loading/ComponentsLoading";
 
 type TProps = {
   permissions: string[];
   setPermissions: React.Dispatch<React.SetStateAction<string[]>>;
+  isLoading?: boolean;
 };
 
 export default function PermissionTable({
   permissions,
   setPermissions,
+  isLoading,
 }: TProps) {
   // return string from const value list
   const getValuePermission = (
@@ -237,48 +240,57 @@ export default function PermissionTable({
 
   return (
     <div className="h-[700px] overflow-y-auto p-4">
-      <Table className="border">
-        <TableHeader>
-          {permissionTable.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {permissionTable?.getRowModel()?.rows?.length ? (
-            permissionTable?.getRowModel()?.rows?.map((row) => (
-              <TableRow
-                key={row.id}
-                // data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+      {isLoading && <ComponentsLoading></ComponentsLoading>}
+      {!isLoading && (
+        <Table className="border">
+          <TableHeader>
+            {permissionTable.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns?.length} className="h-24 text-center">
-                Loading...
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {permissionTable?.getRowModel()?.rows?.length ? (
+              permissionTable?.getRowModel()?.rows?.map((row) => (
+                <TableRow
+                  key={row.id}
+                  // data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns?.length}
+                  className="h-24 text-center"
+                >
+                  <ComponentsLoading></ComponentsLoading>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 }

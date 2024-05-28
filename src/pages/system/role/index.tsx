@@ -48,6 +48,7 @@ import { Controller, useForm } from "react-hook-form";
 import PermissionTable from "./components/permissionsTable";
 import { PERMISSIONS } from "@/configs/permission";
 import { getAllValueOfObject } from "@/utils/helper";
+import ComponentsLoading from "@/components/loading/ComponentsLoading";
 
 type RoleData = {
   _id: string;
@@ -153,7 +154,6 @@ export default function RolePage() {
 
   // Handle checkAllPermissions
 
-
   // Update Permission
   const handleUpdatePermissions = () => {
     updateRoleMutation.mutate(
@@ -222,7 +222,11 @@ export default function RolePage() {
               ) : (
                 <>
                   <div
-                    className="bg-slate-100 p-2 rounded-full hover:bg-slate-200"
+                    className={`p-2 rounded-full text-white ${
+                      selectedRow?._id == row.original._id
+                        ? "bg-purple bg-opacity-30 hover:bg-opacity-50"
+                        : "bg-black hover:bg-slate-200 bg-opacity-100"
+                    }`}
                     onClick={(e) => {
                       handleEdit(e, row.original);
                     }}
@@ -233,7 +237,13 @@ export default function RolePage() {
                       height={20}
                     ></Pencil>
                   </div>
-                  <div className="bg-slate-100 p-2 rounded-full hover:bg-slate-200">
+                  <div
+                    className={`p-2 rounded-full text-white ${
+                      selectedRow?._id == row.original._id
+                        ? "bg-white bg-opacity-30 hover:bg-opacity-50"
+                        : "bg-black hover:bg-slate-200 bg-opacity-100"
+                    }`}
+                  >
                     <Trash2
                       className="font-normal cursor-pointer flex-shrink-0"
                       width={20}
@@ -259,10 +269,10 @@ export default function RolePage() {
   });
 
   return (
-    <div className="grid grid-cols-3 gap-5">
-      <div className="col-span-3 sm:col-span-1">
-        <div className="flex items-center gap-2 w-full">
-          <Search className="flex-shrink-0"></Search>
+    <div className="grid grid-cols-3 gap-5 w-full">
+      <div className="col-span-3 lg:col-span-1">
+        <div className="flex items-center gap-2 w-full flex-wrap">
+          <Search className="flex-shrink-0 !flex-1"></Search>
           <Dialog open={openDialog} onOpenChange={setOpenDialog}>
             <DialogTrigger>
               <div className="w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center text-white bg-purple cursor-pointer">
@@ -336,7 +346,7 @@ export default function RolePage() {
                   key={row.id}
                   className={`cursor-pointer ${
                     selectedRow?._id === row.original._id
-                      ? "bg-purple  hover:bg-purple"
+                      ? "bg-purple  hover:bg-purple text-white"
                       : ""
                   }`}
                   onClick={() => {
@@ -359,7 +369,7 @@ export default function RolePage() {
                   colSpan={columns?.length}
                   className="h-24 text-center"
                 >
-                  Loading...
+                  <ComponentsLoading></ComponentsLoading>
                 </TableCell>
               </TableRow>
             )}
@@ -367,7 +377,7 @@ export default function RolePage() {
         </Table>
       </div>
       {selectedRow && (
-        <div className="col-span-3 sm:col-span-2">
+        <div className="col-span-3 lg:col-span-2">
           <div className="flex items-center justify-between">
             <h2 className="my-2 font-semibold">Permissions With Role</h2>
             <Button
@@ -380,6 +390,7 @@ export default function RolePage() {
           <PermissionTable
             permissions={permissions}
             setPermissions={setPermissions}
+            isLoading={queryDetailRole.isLoading}
           ></PermissionTable>
         </div>
       )}

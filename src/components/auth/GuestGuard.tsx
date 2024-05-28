@@ -3,7 +3,6 @@ import { useAppContext } from "@/context/app.context";
 import { getAccessTokenFromLS, getUserFromLS } from "@/utils/auth";
 import { useRouter } from "next/router";
 import { ReactNode, ReactElement, useEffect, useState } from "react";
-import Spinner from "../Spinner";
 
 interface GuestGuardProps {
   children: ReactNode;
@@ -27,7 +26,7 @@ const GuestGuard = (props: GuestGuardProps) => {
 
   return (
     <>
-      {loader && <Spinner></Spinner>}
+      {loader && <ComponentsLoading></ComponentsLoading>}
       {!loader && children}
     </>
   );

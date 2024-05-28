@@ -27,13 +27,13 @@ export default function DropdownMenu({ items }: { items: TDropdownItem[] }) {
         items.map((item) => (
           <Accordion
             type="multiple"
-            className={`w-full p-2 text-md`}
+            className={`w-full my-1 pl-2 text-sm`}
             key={item.title}
           >
             <AccordionItem value="item-1" className="border-none py-0">
               {/* Title + ICON */}
               <AccordionTrigger
-                className={`p-2  rounded-lg  font-medium ${
+                className={`p-3 rounded-lg  font-medium ${
                   router.asPath.startsWith(item.link)
                     ? "bg-purple bg-opacity-90 text-white"
                     : "bg-white text-black"
@@ -43,7 +43,7 @@ export default function DropdownMenu({ items }: { items: TDropdownItem[] }) {
               >
                 <div className="flex items-center gap-2">
                   <div
-                    className={`p-2 rounded-lg ${
+                    className={` rounded-lg ${
                       router.asPath.startsWith(item.link)
                         ? "bg-purple text-white"
                         : "bg-white text-black"
@@ -56,7 +56,7 @@ export default function DropdownMenu({ items }: { items: TDropdownItem[] }) {
               </AccordionTrigger>
               {/* Check if has children */}
               {item.children && item.children.length > 0 && (
-                <AccordionContent>
+                <AccordionContent className="pl-2">
                   <DropdownMenu items={item.children}></DropdownMenu>
                 </AccordionContent>
               )}
