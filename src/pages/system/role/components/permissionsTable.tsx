@@ -14,6 +14,7 @@ import {
 } from "@tanstack/react-table";
 import { LIST_DATA_PERMISSIONS, PERMISSIONS } from "@/configs/permission";
 import { Checkbox } from "@/components/ui/checkbox";
+import { getAllValueOfObject } from "@/utils/helper";
 
 type TProps = {
   permissions: string[];
@@ -50,14 +51,52 @@ export default function PermissionTable({
     }
   };
 
+  const handleCheckIsCheckAll = (value: string, parentValues?: string) => {
+    let allValue = parentValues
+      ? getAllValueOfObject(PERMISSIONS[parentValues][value])
+      : getAllValueOfObject(PERMISSIONS[value]);
+
+    let isCheckAll = allValue.every((item) => permissions?.includes(item));
+    return {
+      isCheckAll,
+      allValue,
+    };
+  };
+
+  // Handle checkAll Permissions
+  const handleCheckAllPermissions = (value: string, parentValues?: string) => {
+    const { isCheckAll, allValue } = handleCheckIsCheckAll(value, parentValues);
+    // isCheckAll -> filter ra
+    if (isCheckAll) {
+      let newArr = permissions.filter((item) => !allValue?.includes(item));
+      setPermissions(newArr);
+    } else {
+      allValue.forEach((item) => permissions.push(item));
+      let newArr = new Set(permissions);
+      setPermissions([...newArr]);
+    }
+  };
   const columns = [
     {
       id: "all",
       header: () => <div className="flex items-center gap-2">All</div>,
       cell: ({ row }: { row: any }) => {
+        const { isCheckAll } = handleCheckIsCheckAll(
+          row.original.value,
+          row.original.parentValue
+        );
         return (
           !row.original.isHideAll && (
-            <Checkbox value={row.original.value}></Checkbox>
+            <Checkbox
+              value={row.original.value}
+              onClick={(e) =>
+                handleCheckAllPermissions(
+                  (e.target as HTMLInputElement).value,
+                  row.original.parentValue
+                )
+              }
+              checked={isCheckAll}
+            ></Checkbox>
           )
         );
       },

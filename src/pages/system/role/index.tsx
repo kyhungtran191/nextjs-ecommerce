@@ -151,6 +151,9 @@ export default function RolePage() {
     [isEdit, reset, queryClient, updateRoleMutation, createRoleMutation]
   );
 
+  // Handle checkAllPermissions
+
+
   // Update Permission
   const handleUpdatePermissions = () => {
     updateRoleMutation.mutate(
