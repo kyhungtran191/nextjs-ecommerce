@@ -3,6 +3,7 @@ import { useAppContext } from "@/context/app.context";
 import { getAccessTokenFromLS, getUserFromLS } from "@/utils/auth";
 import { useRouter } from "next/router";
 import { ReactNode, ReactElement, useEffect, useState } from "react";
+import ComponentsLoading from "../loading/ComponentsLoading";
 
 interface GuestGuardProps {
   children: ReactNode;
