@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
 import { ACLObj, AppAbility, buildAbilityFor } from "@/configs/acl";
 import { useAppContext } from "@/context/app.context";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { AbilityContext } from "../acl/Can";
 import NotAuthorized from "@/pages/401";
-import ComponentsLoading from "../loading/ComponentsLoading";
+import AdminDashboard from "@/layout/partials/admin/AdminLayout";
 
 // ** Types
+
 interface AclGuardProps {
   children: ReactNode;
   authGuard?: boolean;
@@ -24,23 +24,19 @@ const AclGuard = (props: AclGuardProps) => {
     authGuard = true,
   } = props;
   const { isAuth, user } = useAppContext();
-  const [ability, setAbility] = useState<any>(null);
-  const [isMounted, setIsMounted] = useState(false);
+  let ability: any;
   const router = useRouter();
-
-  useEffect(() => {
-    if (isAuth) {
-      const permissionUser = user?.role?.permissions || [];
-      const builtAbility = buildAbilityFor(
-        permissionUser,
-        aclAbilities.subject
-      );
-      setAbility(builtAbility);
-    }
-    setIsMounted(true);
-  }, [isAuth, user, aclAbilities.subject]);
-
-  if (guestGuard || router.route === "/500" || router.route === "/404") {
+  // if (typeof window !== "undefined") {
+  const permissionUser = user?.role?.permissions || [];
+  if (isAuth && !ability) {
+    ability = buildAbilityFor(permissionUser, aclAbilities.subject);
+  }
+  if (
+    guestGuard ||
+    router.route === "/500" ||
+    router.route === "404"
+    // ||!authGuard
+  ) {
     if (isAuth && ability) {
       return (
         <AbilityContext.Provider value={ability}>
@@ -51,7 +47,6 @@ const AclGuard = (props: AclGuardProps) => {
       return <>{children}</>;
     }
   }
-
   if (
     ability &&
     isAuth &&
@@ -63,8 +58,6 @@ const AclGuard = (props: AclGuardProps) => {
       </AbilityContext.Provider>
     );
   }
-
-  return <NotAuthorized />;
+  return <>{children}</>;
 };
-
 export default AclGuard;

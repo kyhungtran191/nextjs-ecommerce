@@ -29,6 +29,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { AxiosInterceptor } from "@/configs/axiosInstance";
 import { ThemeProvider } from "@/components/theme-provider";
 import Fallback from "@/components/loading/ComponentsLoading";
+import ComponentsLoading from "@/components/loading/ComponentsLoading";
 // ** Contexts
 
 // ** Global css styles
@@ -45,11 +46,19 @@ type GuardProps = {
 
 const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
   if (guestGuard) {
-    return <GuestGuard>{children}</GuestGuard>;
+    return (
+      <GuestGuard fallback={<ComponentsLoading></ComponentsLoading>}>
+        {children}
+      </GuestGuard>
+    );
   } else if (!guestGuard && !authGuard) {
     return <>{children}</>;
   } else {
-    return <AuthGuard>{children}</AuthGuard>;
+    return (
+      <AuthGuard fallback={<ComponentsLoading></ComponentsLoading>}>
+        {children}
+      </AuthGuard>
+    );
   }
 };
 // Font family

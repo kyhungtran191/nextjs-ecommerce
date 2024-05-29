@@ -7,30 +7,34 @@ import ComponentsLoading from "../loading/ComponentsLoading";
 
 interface GuestGuardProps {
   children: ReactNode;
+  fallback: ReactElement | null;
 }
 const GuestGuard = (props: GuestGuardProps) => {
-  const { children } = props;
-  const { isAuth, user } = useAppContext();
-  const [loader, setLoader] = useState(true);
+  const { children, fallback } = props;
+
+  // ** router
   const router = useRouter();
+
+  // ** auth
+  const authContext = useAppContext();
+
   useEffect(() => {
     if (!router.isReady) {
       return;
     }
-    if (isAuth) {
-      console.log(1);
+    if (
+      window.localStorage.getItem("access_token") &&
+      window.localStorage.getItem("refresh_token")
+    ) {
       router.replace("/");
-    } else {
-      setLoader(false);
     }
   }, [router.route]);
 
-  return (
-    <>
-      {loader && <ComponentsLoading></ComponentsLoading>}
-      {!loader && children}
-    </>
-  );
+  if (authContext.isAuth && authContext.user) {
+    return fallback;
+  }
+
+  return <>{children}</>;
 };
 
 export default GuestGuard;

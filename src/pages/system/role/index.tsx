@@ -402,3 +402,5 @@ export default function RolePage() {
 RolePage.getLayout = (page: ReactNode) => (
   <AdminDashboard>{page}</AdminDashboard>
 );
+
+RolePage.authGuard = true;
