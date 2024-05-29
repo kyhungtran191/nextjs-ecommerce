@@ -89,7 +89,6 @@ const AxiosInterceptor = ({ children }: { children: React.ReactNode }) => {
             });
           }
         } else {
-          console.log(1);
           clearLS();
           setUser(undefined);
           setIsAuth(false);

@@ -16,17 +16,20 @@ import { LIST_DATA_PERMISSIONS, PERMISSIONS } from "@/configs/permission";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getAllValueOfObject } from "@/utils/helper";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
+import { RoleData } from "@/@types/role.type";
 
 type TProps = {
   permissions: string[];
   setPermissions: React.Dispatch<React.SetStateAction<string[]>>;
   isLoading?: boolean;
+  selectedRow?: RoleData | null;
 };
 
 export default function PermissionTable({
   permissions,
   setPermissions,
   isLoading,
+  selectedRow,
 }: TProps) {
   // return string from const value list
   const getValuePermission = (
@@ -79,6 +82,7 @@ export default function PermissionTable({
       setPermissions([...newArr]);
     }
   };
+  console.log(selectedRow);
   const columns = [
     {
       id: "all",
@@ -99,6 +103,10 @@ export default function PermissionTable({
                 )
               }
               checked={isCheckAll}
+              disabled={
+                selectedRow?.permissions?.includes(PERMISSIONS.ADMIN) ||
+                selectedRow?.permissions.includes(PERMISSIONS.BASIC)
+              }
             ></Checkbox>
           )
         );
@@ -143,6 +151,10 @@ export default function PermissionTable({
                 handleOnChangeCheckBox((e.target as HTMLInputElement).value);
               }}
               checked={permissions?.includes(value)}
+              disabled={
+                selectedRow?.permissions?.includes(PERMISSIONS.ADMIN) ||
+                selectedRow?.permissions.includes(PERMISSIONS.BASIC)
+              }
             ></Checkbox>
           )
         );
@@ -169,6 +181,10 @@ export default function PermissionTable({
                 handleOnChangeCheckBox((e.target as HTMLInputElement).value);
               }}
               checked={permissions?.includes(value)}
+              disabled={
+                selectedRow?.permissions?.includes(PERMISSIONS.ADMIN) ||
+                selectedRow?.permissions.includes(PERMISSIONS.BASIC)
+              }
             ></Checkbox>
           )
         );
@@ -195,6 +211,10 @@ export default function PermissionTable({
                 handleOnChangeCheckBox((e.target as HTMLInputElement).value);
               }}
               checked={permissions?.includes(value)}
+              disabled={
+                selectedRow?.permissions?.includes(PERMISSIONS.ADMIN) ||
+                selectedRow?.permissions.includes(PERMISSIONS.BASIC)
+              }
             ></Checkbox>
           )
         );
@@ -221,6 +241,10 @@ export default function PermissionTable({
                 handleOnChangeCheckBox((e.target as HTMLInputElement).value);
               }}
               checked={permissions?.includes(value)}
+              disabled={
+                selectedRow?.permissions?.includes(PERMISSIONS.ADMIN) ||
+                selectedRow?.permissions.includes(PERMISSIONS.BASIC)
+              }
             ></Checkbox>
           )
         );

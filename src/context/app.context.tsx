@@ -1,5 +1,7 @@
 import { User } from "@/@types/auth.type";
+import { profile } from "@/services/auth.services";
 import { getAccessTokenFromLS, getUserFromLS } from "@/utils/auth";
+import { useQuery } from "@tanstack/react-query";
 import {
   createContext,
   Dispatch,
@@ -36,7 +38,17 @@ export const AppContextProvider = ({
   children: React.ReactNode;
 }) => {
   const [user, setUser] = useState<User | undefined>(initialAppContext.user);
-  const [isAuth, setIsAuth] = useState(Boolean(getAccessTokenFromLS()));
+
+  const [isAuth, setIsAuth] = useState(false);
+
+  const fetchMeQuery = useQuery({
+    queryKey: ["me"],
+    queryFn: () => profile(),
+    enabled: Boolean(getAccessTokenFromLS()),
+    onSuccess: (data) => {
+      setIsAuth(true);
+    },
+  });
 
   return (
     <AppContext.Provider value={{ isAuth, user, setUser, setIsAuth }}>

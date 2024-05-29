@@ -29,6 +29,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { AxiosInterceptor } from "@/configs/axiosInstance";
 import { ThemeProvider } from "@/components/theme-provider";
 import Fallback from "@/components/loading/ComponentsLoading";
+import ComponentsLoading from "@/components/loading/ComponentsLoading";
 // ** Contexts
 
 // ** Global css styles
@@ -45,11 +46,19 @@ type GuardProps = {
 
 const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
   if (guestGuard) {
-    return <GuestGuard>{children}</GuestGuard>;
+    return (
+      <GuestGuard fallback={<ComponentsLoading></ComponentsLoading>}>
+        {children}
+      </GuestGuard>
+    );
   } else if (!guestGuard && !authGuard) {
     return <>{children}</>;
   } else {
-    return <AuthGuard>{children}</AuthGuard>;
+    return (
+      <AuthGuard fallback={<ComponentsLoading></ComponentsLoading>}>
+        {children}
+      </AuthGuard>
+    );
   }
 };
 // Font family
@@ -83,36 +92,29 @@ export default function App(props: ExtendedAppProps) {
       <Head>
         <title>HShop</title>
       </Head>
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-      >
-        <QueryClientProvider client={queryClient}>
-          <ReactQueryDevtools initialIsOpen={false} />
-          <ToastContainer></ToastContainer>
-          <AppContextProvider>
-            <AxiosInterceptor>
-              <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                <AclGuard
-                  aclAbilities={aclAbilities}
-                  guestGuard={guestGuard}
-                  authGuard={authGuard}
-                >
-                  {getLayout(<Component {...pageProps} />)}
-                  <ProgressBar
-                    height="2px"
-                    color="purple"
-                    options={{ showSpinner: false }}
-                    shallowRouting
-                  />
-                </AclGuard>
-              </Guard>
-            </AxiosInterceptor>
-          </AppContextProvider>
-        </QueryClientProvider>
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ReactQueryDevtools initialIsOpen={false} />
+        <ToastContainer></ToastContainer>
+        <AppContextProvider>
+          <AxiosInterceptor>
+            <Guard authGuard={authGuard} guestGuard={guestGuard}>
+              <AclGuard
+                aclAbilities={aclAbilities}
+                guestGuard={guestGuard}
+                authGuard={authGuard}
+              >
+                {getLayout(<Component {...pageProps} />)}
+                <ProgressBar
+                  height="2px"
+                  color="purple"
+                  options={{ showSpinner: false }}
+                  shallowRouting
+                />
+              </AclGuard>
+            </Guard>
+          </AxiosInterceptor>
+        </AppContextProvider>
+      </QueryClientProvider>
     </main>
   );
 }

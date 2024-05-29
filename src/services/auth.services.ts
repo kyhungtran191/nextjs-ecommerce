@@ -20,4 +20,8 @@ export const register = (data: TLogin) => {
   return axios.post<ResponseData<ResponseLogin>>(AuthAPI.register, data);
 };
 
+export const profile = () => {
+  return instanceAxios.get<ResponseData<Response>>(AuthAPI.me);
+};
+
 export const logout = () => instanceAxios.post<{}>(AuthAPI.logout);
