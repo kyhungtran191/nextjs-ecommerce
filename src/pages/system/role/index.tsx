@@ -49,6 +49,7 @@ import PermissionTable from "./components/permissionsTable";
 import { PERMISSIONS } from "@/configs/permission";
 import { getAllValueOfObject } from "@/utils/helper";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
+import { usePermission } from "@/hooks/usePermissions";
 
 type RoleData = {
   _id: string;
@@ -71,6 +72,13 @@ export default function RolePage() {
   const schema = yup.object().shape({
     role_name: yup.string().required("This field is required"),
   });
+  // Default use of usePermissions
+  const permissionsListCheck = usePermission("PERMISSIONS.SYSTEM.ROLE", [
+    "CREATE",
+    "VIEW",
+    "UPDATE",
+    "DELETE",
+  ]);
 
   const {
     handleSubmit,
