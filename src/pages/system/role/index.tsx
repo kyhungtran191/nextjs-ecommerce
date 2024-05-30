@@ -194,7 +194,6 @@ export default function RolePage() {
       setRoleData(roleQueryData.data?.data.data?.roles || []);
     }
   }, [roleQueryData.data]);
-  console.log(selectedRow);
   const columns = useMemo(
     () => [
       {
@@ -404,3 +403,4 @@ RolePage.getLayout = (page: ReactNode) => (
 );
 
 RolePage.authGuard = true;
+RolePage.permissions = [PERMISSIONS.SYSTEM.ROLE.VIEW];

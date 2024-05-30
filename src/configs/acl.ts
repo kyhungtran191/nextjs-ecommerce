@@ -7,6 +7,7 @@ export type Actions = "manage" | "create" | "read" | "update" | "delete";
 export type AppAbility = Ability<[Actions, Subjects]> | undefined;
 
 export const AppAbility = Ability as any;
+
 export type ACLObj = {
   action: Actions;
   subject: string;
@@ -17,20 +18,24 @@ export type ACLObj = {
  * We have just shown Admin and Client rules for demo purpose where
  * admin can manage everything and client can just visit ACL page
  */
-const defineRulesFor = (permission: string[], subject: string) => {
+const defineRulesFor = (permissionUser: string[], permissions: string[]) => {
   const { can, rules } = new AbilityBuilder(AppAbility);
-  // permission includes
-  if (permission?.includes(PERMISSIONS.ADMIN)) {
+
+  if (
+    !permissions.length ||
+    permissionUser.includes(PERMISSIONS.ADMIN) ||
+    permissions.every((permission) => permissionUser.includes(permission))
+  ) {
     can("manage", "all");
   }
   return rules;
 };
 
 export const buildAbilityFor = (
-  permission: string[],
-  subject: string
+  permissionUser: string[],
+  permissions: string[]
 ): AppAbility => {
-  return new AppAbility(defineRulesFor(permission, subject), {
+  return new AppAbility(defineRulesFor(permissionUser, permissions), {
     // https://casl.js.org/v5/en/guide/subject-type-detection
     // @ts-ignore
     detectSubjectType: (object) => object!.type,

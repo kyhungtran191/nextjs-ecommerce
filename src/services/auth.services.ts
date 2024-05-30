@@ -13,15 +13,15 @@ export type ResponseLogin = {
   status: string;
 };
 
-export const login = (data: TLogin) =>
-  axios.post<ResponseData<ResponseLogin>>(AuthAPI.login, data);
+export const login = async (data: TLogin) =>
+  await axios.post<ResponseData<ResponseLogin>>(AuthAPI.login, data);
 
-export const register = (data: TLogin) => {
-  return axios.post<ResponseData<ResponseLogin>>(AuthAPI.register, data);
+export const register = async (data: TLogin) => {
+  return await axios.post<ResponseData<ResponseLogin>>(AuthAPI.register, data);
 };
 
-export const profile = () => {
-  return instanceAxios.get<ResponseData<Response>>(AuthAPI.me);
+export const profile = async () => {
+  return await instanceAxios.get<ResponseData<User>>(AuthAPI.me);
 };
 
-export const logout = () => instanceAxios.post<{}>(AuthAPI.logout);
+export const logout = async () => await instanceAxios.post<{}>(AuthAPI.logout);

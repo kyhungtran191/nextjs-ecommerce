@@ -15,8 +15,16 @@ import {
   Truck,
   CreditCard,
 } from "lucide-react";
+import { PERMISSIONS } from "./permission";
+import { useAppContext } from "@/context/app.context";
+
 export const menuAdmin = [
-  { title: "Dashboard", icon: LayoutDashboard, link: "/dashboard" },
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    link: "/dashboard",
+    permission: PERMISSIONS.DASHBOARD,
+  },
   {
     title: "System",
     icon: LayoutTemplate,
@@ -26,11 +34,13 @@ export const menuAdmin = [
         title: "Users",
         icon: Users,
         link: "/system/users",
+        permission: PERMISSIONS.SYSTEM.USER.VIEW,
       },
       {
         title: "Roles",
         icon: AppWindow,
         link: "/system/role",
+        permission: PERMISSIONS.SYSTEM.ROLE.VIEW,
       },
     ],
   },
@@ -43,11 +53,13 @@ export const menuAdmin = [
         title: "Products",
         icon: PackageOpen,
         link: "/product-manage/product",
+        permission: PERMISSIONS.MANAGE_PRODUCT.PRODUCT.VIEW,
       },
       {
         title: "Product Type",
         icon: SquareGanttChart,
         link: "/product-manage/type",
+        permission: PERMISSIONS.MANAGE_PRODUCT.PRODUCT_TYPE.VIEW,
       },
       {
         title: "Comments",
@@ -65,6 +77,7 @@ export const menuAdmin = [
         title: "Order List",
         icon: ScrollText,
         link: "/manage-order/order",
+        permission: PERMISSIONS.MANAGE_ORDER.ORDER.VIEW,
       },
       {
         title: "Reviews",

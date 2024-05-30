@@ -13,6 +13,8 @@ type TDropdownItem = {
   icon: LucideIcon;
   children?: TDropdownItem[];
   link: string;
+  permission?: string;
+  isHidden?: boolean;
 };
 export default function DropdownMenu({ items }: { items: TDropdownItem[] }) {
   const router = useRouter();
@@ -27,7 +29,9 @@ export default function DropdownMenu({ items }: { items: TDropdownItem[] }) {
         items.map((item) => (
           <Accordion
             type="multiple"
-            className={`w-full my-1 pl-2 text-sm`}
+            className={`w-full my-1 pl-2 text-sm ${
+              item.isHidden ? "hidden" : "block"
+            }`}
             key={item.title}
           >
             <AccordionItem value="item-1" className="border-none py-0">
