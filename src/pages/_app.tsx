@@ -78,6 +78,8 @@ export default function App(props: ExtendedAppProps) {
 
   const aclAbilities = Component.acl ?? defaultACLObj;
 
+  const permissions = Component.permissions ?? [];
+
   // Query Client (React Query)
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -99,6 +101,7 @@ export default function App(props: ExtendedAppProps) {
           <AxiosInterceptor>
             <Guard authGuard={authGuard} guestGuard={guestGuard}>
               <AclGuard
+                permissions={permissions}
                 aclAbilities={aclAbilities}
                 guestGuard={guestGuard}
                 authGuard={authGuard}

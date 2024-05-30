@@ -82,7 +82,7 @@ export default function PermissionTable({
       setPermissions([...newArr]);
     }
   };
-  console.log(selectedRow);
+
   const columns = [
     {
       id: "all",

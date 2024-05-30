@@ -1,14 +1,16 @@
 import { User } from "@/@types/auth.type";
 import { profile } from "@/services/auth.services";
-import { getAccessTokenFromLS, getUserFromLS } from "@/utils/auth";
+import { clearLS, getAccessTokenFromLS, getUserFromLS } from "@/utils/auth";
 import { useQuery } from "@tanstack/react-query";
 import {
   createContext,
   Dispatch,
   SetStateAction,
   useContext,
+  useEffect,
   useState,
 } from "react";
+import { toast } from "react-toastify";
 
 type AppContextType = {
   user: User | undefined;
@@ -46,7 +48,17 @@ export const AppContextProvider = ({
     queryFn: () => profile(),
     enabled: Boolean(getAccessTokenFromLS()),
     onSuccess: (data) => {
+      const userData = data && data?.data?.data;
+      setUser(userData as User);
       setIsAuth(true);
+    },
+    onError: (err: any) => {
+      if (err) {
+        toast.error("Error when fetching me");
+        setUser(undefined);
+        clearLS();
+        setIsAuth(false);
+      }
     },
   });
 

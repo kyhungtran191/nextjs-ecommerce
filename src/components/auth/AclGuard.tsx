@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 import { AbilityContext } from "../acl/Can";
 import NotAuthorized from "@/pages/401";
 import AdminDashboard from "@/layout/partials/admin/AdminLayout";
+import { PERMISSIONS } from "@/configs/permission";
 
 // ** Types
 
@@ -13,6 +14,7 @@ interface AclGuardProps {
   authGuard?: boolean;
   guestGuard?: boolean;
   aclAbilities: ACLObj;
+  permissions: string[];
 }
 
 const AclGuard = (props: AclGuardProps) => {
@@ -22,14 +24,21 @@ const AclGuard = (props: AclGuardProps) => {
     children,
     guestGuard = false,
     authGuard = true,
+    permissions,
   } = props;
   const { isAuth, user } = useAppContext();
   let ability: any;
   const router = useRouter();
   // if (typeof window !== "undefined") {
-  const permissionUser = user?.role?.permissions || [];
+  // const permissionUser: string[] = [];
+  const permissionUser = user?.role?.permissions
+    ? user?.role?.permissions?.includes(PERMISSIONS.BASIC)
+      ? [PERMISSIONS.DASHBOARD]
+      : user?.role?.permissions
+    : [];
+
   if (isAuth && !ability) {
-    ability = buildAbilityFor(permissionUser, aclAbilities.subject);
+    ability = buildAbilityFor(permissionUser, permissions);
   }
   if (
     guestGuard ||
@@ -58,6 +67,6 @@ const AclGuard = (props: AclGuardProps) => {
       </AbilityContext.Provider>
     );
   }
-  return <>{children}</>;
+  return <NotAuthorized></NotAuthorized>;
 };
 export default AclGuard;

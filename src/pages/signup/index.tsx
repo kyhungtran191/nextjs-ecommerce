@@ -56,7 +56,6 @@ export default function SignUp() {
   const isLoading = false;
 
   const onSubmit = (data: TDefaultValue) => {
-    console.log(data);
     let { confirmPassword, ...rest } = data;
     registerMutation.mutate(rest, {
       onSuccess(data) {
