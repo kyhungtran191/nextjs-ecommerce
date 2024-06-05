@@ -212,6 +212,7 @@ export default function RolePage() {
         },
         enableSorting: false,
         enableHiding: false,
+        
       },
       {
         id: "action",
