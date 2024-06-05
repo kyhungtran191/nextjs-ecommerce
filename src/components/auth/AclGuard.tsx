@@ -29,8 +29,7 @@ const AclGuard = (props: AclGuardProps) => {
   const { isAuth, user } = useAppContext();
   let ability: any;
   const router = useRouter();
-  // if (typeof window !== "undefined") {
-  // const permissionUser: string[] = [];
+
   const permissionUser = user?.role?.permissions
     ? user?.role?.permissions?.includes(PERMISSIONS.BASIC)
       ? [PERMISSIONS.DASHBOARD]
@@ -43,8 +42,8 @@ const AclGuard = (props: AclGuardProps) => {
   if (
     guestGuard ||
     router.route === "/500" ||
-    router.route === "404"
-    // ||!authGuard
+    router.route === "404" ||
+    !authGuard
   ) {
     if (isAuth && ability) {
       return (

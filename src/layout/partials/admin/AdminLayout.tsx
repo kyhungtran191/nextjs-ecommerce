@@ -1,12 +1,4 @@
 import { Metadata } from "next";
-import Image from "next/image";
-import { Plus } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Menu } from "./menu";
 import { Sidebar } from "./Sidebar";
 import Header from "./Header";
 
@@ -21,16 +13,18 @@ export interface IProps {
 
 export default function AdminDashboard({ children }: IProps) {
   return (
-    <div className="">
+    <div>
       {/* Header */}
       <Header></Header>
       <div className="border-t">
         <div className="bg-background">
-          <div className="grid medium:grid-cols-5 min-h-[calc(100vh-70px)]">
+          <div className="grid grid-cols-5 min-h-[calc(100vh-70px)]">
             {/* Sidebar */}
-            <Sidebar className="hidden medium:block" />
-            <div className="col-span-3 lg:col-span-4 lg:border-l">
-              <div className="h-full px-4 py-6 lg:px-8">{children}</div>
+            <Sidebar className="hidden medium:block medium:col-span-1" />
+            <div className="col-span-5 medium:col-span-4 lg:border-l">
+              <div className="h-full px-4 py-6 lg:px-8 w-full overflow-hidden">
+                {children}
+              </div>
             </div>
           </div>
         </div>

@@ -7,7 +7,7 @@ export const toFullName = (
   lastName: string,
   middleName: string,
   firstName: string,
-  language: string
+  language: string 
 ) => {
   if (language === "vi") {
     return `${lastName ? lastName : ""} ${middleName ? middleName : ""} ${
