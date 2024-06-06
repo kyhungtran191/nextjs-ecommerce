@@ -1,6 +1,7 @@
 // ** React Imports
 import { ReactNode } from "react";
 import "@/styles/globals.css";
+
 // ** Next Imports
 import Head from "next/head";
 import type { NextPage } from "next";

@@ -51,7 +51,10 @@ import { getAllValueOfObject } from "@/utils/helper";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
 import { usePermission } from "@/hooks/usePermissions";
 import { useQueryRole } from "@/query/useQueryRole";
-
+import Swal from "sweetalert2";
+import instanceAxios from "@/configs/axiosInstance";
+import { ResponseData } from "@/@types/message.type";
+import { RoleAPI } from "@/apis/role.api";
 type RoleData = {
   _id: string;
   name: string;
@@ -74,12 +77,10 @@ export default function RolePage() {
     role_name: yup.string().required("This field is required"),
   });
   // Default use of usePermissions
-  const permissionsListCheck = usePermission("PERMISSIONS.SYSTEM.ROLE", [
-    "CREATE",
-    "VIEW",
-    "UPDATE",
-    "DELETE",
-  ]);
+  const { CREATE, DELETE, UPDATE, VIEW } = usePermission(
+    "PERMISSIONS.SYSTEM.ROLE",
+    ["CREATE", "VIEW", "UPDATE", "DELETE"]
+  );
 
   const {
     handleSubmit,
@@ -98,11 +99,12 @@ export default function RolePage() {
     enabled: Boolean(selectedRow),
   });
 
+  // Update Role
   const updateRoleMutation = useMutation({
     mutationFn: (body: { name?: string; permissions?: string[]; id: string }) =>
       updateRole(body),
   });
-
+  // Create Role
   const createRoleMutation = useMutation({
     mutationFn: (body: { name: string }) => createRole(body),
   });
@@ -199,6 +201,35 @@ export default function RolePage() {
     }
   }, [roleQueryData.data]);
 
+  const handleDeleteRole = (id: string) => {
+    console.log(id);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await instanceAxios
+          .delete<ResponseData<RoleData>>(`${RoleAPI.ROLE}/${id}`)
+          .then(() => {
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your file has been deleted.",
+              icon: "success",
+            });
+          })
+          .catch((err: any) => {
+            let errMsg = err.response.data.message;
+            toast.error(errMsg);
+          });
+      }
+    });
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -228,15 +259,20 @@ export default function RolePage() {
                   <div
                     className={`p-2 rounded-full text-white ${
                       selectedRow?._id == row.original._id
-                        ? "bg-purple bg-opacity-30 hover:bg-opacity-50"
+                        ? "bg-purple text-white"
                         : "bg-black hover:bg-slate-200 bg-opacity-100"
-                    }`}
+                    }  ${!UPDATE ? "hidden" : "block"}`}
                     onClick={(e) => {
+                      if (!UPDATE) return;
                       handleEdit(e, row.original);
                     }}
                   >
                     <Pencil
-                      className="font-normal cursor-pointer flex-shrink-0 "
+                      className={`font-normal cursor-pointer flex-shrink-0  ${
+                        UPDATE
+                          ? "!cursor-not-allowed bg-opacity-50"
+                          : "cursor-default bg-opacity-100"
+                      }`}
                       width={20}
                       height={20}
                     ></Pencil>
@@ -244,14 +280,18 @@ export default function RolePage() {
                   <div
                     className={`p-2 rounded-full text-white ${
                       selectedRow?._id == row.original._id
-                        ? "bg-white bg-opacity-30 hover:bg-opacity-50"
+                        ? "bg-purple text-white"
                         : "bg-black hover:bg-slate-200 bg-opacity-100"
-                    }`}
+                    }  ${!DELETE ? "hidden" : "block"}`}
                   >
                     <Trash2
                       className="font-normal cursor-pointer flex-shrink-0"
                       width={20}
                       height={20}
+                      onClick={() => {
+                        if (!DELETE) return;
+                        handleDeleteRole(row.original._id);
+                      }}
                     ></Trash2>
                   </div>
                 </>
@@ -278,8 +318,14 @@ export default function RolePage() {
         <div className="flex items-center gap-2 w-full flex-wrap">
           <Search className="flex-shrink-0 !flex-1"></Search>
           <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-            <DialogTrigger>
-              <div className="w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center text-white bg-purple cursor-pointer">
+            <DialogTrigger disabled={!CREATE} className={``}>
+              <div
+                className={`w-10 h-10 flex-shrink-0 rounded-full flex items-center justify-center text-white bg-purple cursor-pointer ${
+                  !CREATE
+                    ? "!cursor-not-allowed bg-opacity-50"
+                    : "cursor-default bg-opacity-100"
+                }`}
+              >
                 <Plus></Plus>
               </div>
             </DialogTrigger>
