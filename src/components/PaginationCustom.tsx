@@ -13,12 +13,12 @@ export default function PaginationCustom({
   pathname,
   queryConfig,
   totalPage,
-  className
+  className,
 }: {
   pathname: string;
   queryConfig: any;
   totalPage: number;
-  className:string
+  className?: string;
 }) {
   const page = Number(queryConfig.page);
   let dotAfter = false;
@@ -50,7 +50,7 @@ export default function PaginationCustom({
     }
   }
   return (
-    <Pagination>
+    <Pagination className={className}>
       <PaginationContent>
         <Link
           href={{

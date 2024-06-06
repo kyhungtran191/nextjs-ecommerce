@@ -435,6 +435,7 @@ export default function UserPage() {
       </Table>
 
       <PaginationCustom
+      className="mt-3"
         pathname={pathname}
         queryConfig={queryConfig}
         totalPage={pageSize}
