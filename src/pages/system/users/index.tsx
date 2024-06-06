@@ -1,7 +1,13 @@
 import AdminDashboard from "@/layout/partials/admin/AdminLayout";
-import { getAllUser } from "@/services/user.services";
+import { getAllUser, getDetailUser } from "@/services/user.services";
 import { useQuery } from "@tanstack/react-query";
-import React, { ReactNode, useMemo, useState } from "react";
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,10 +15,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import { TUser } from "@/@types/user.type";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, EllipsisVertical, Pencil, User } from "lucide-react";
+import {
+  ArrowUpDown,
+  EllipsisVertical,
+  Pencil,
+  User,
+  UsersRound,
+} from "lucide-react";
 import {
   SortingState,
   flexRender,
@@ -31,12 +44,27 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toFullName } from "@/utils/helper";
+import ComponentsLoading from "@/components/loading/ComponentsLoading";
+import { Input } from "@/components/ui/input";
+import {
+  MultiSelect,
+  OptionType,
+  SelectedType,
+} from "@/components/MultiSelect";
+import { useQueryRole } from "@/query/useQueryRole";
+
+import { Label } from "@/components/ui/label";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import EditAddUserDialog from "./components/EditAddUserDialog";
 export default function UserPage() {
   const [viewUser, setViewUser] = useState({});
   const [users, setUsers] = useState<TUser[] | []>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
-
+  const [roleSelected, setRoleSelected] = useState<SelectedType[] | []>([]);
+  const [roleOptions, setRoleOptions] = useState<OptionType[] | []>([]);
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
+  const [editUser, setEditUser] = useState<undefined | string>(undefined);
   const data = useQuery({
     queryKey: ["users"],
     queryFn: () => getAllUser(),
@@ -47,6 +75,22 @@ export default function UserPage() {
       setUsers(userData);
     },
   });
+
+  const roleData = useQueryRole();
+
+  useEffect(() => {
+    if (!roleData.data) return;
+    const { roles } = roleData.data.data.data || {};
+    if (roles) {
+      setRoleOptions(
+        roles.map((role) => ({
+          label: role.name,
+          value: role._id,
+        }))
+      );
+    }
+  }, [roleData.data]);
+
   const usersData = useMemo(
     () =>
       users
@@ -104,13 +148,13 @@ export default function UserPage() {
       accessorKey: "fullName",
       header: ({ column }: { column: any }) => {
         return (
-          <Button
-            variant="ghost"
+          <div
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex cursor-pointer"
           >
             Full Name
             <ArrowUpDown className="w-4 h-4 ml-2" />
-          </Button>
+          </div>
         );
       },
     },
@@ -119,13 +163,13 @@ export default function UserPage() {
       accessorKey: "email",
       header: ({ column }: { column: any }) => {
         return (
-          <Button
-            variant="ghost"
+          <div
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex cursor-pointer"
           >
             Email
             <ArrowUpDown className="w-4 h-4 ml-2" />
-          </Button>
+          </div>
         );
       },
     },
@@ -134,13 +178,13 @@ export default function UserPage() {
       accessorKey: "role",
       header: ({ column }: { column: any }) => {
         return (
-          <Button
-            variant="ghost"
+          <div
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex cursor-pointer"
           >
             Role
             <ArrowUpDown className="w-4 h-4 ml-2" />
-          </Button>
+          </div>
         );
       },
     },
@@ -148,13 +192,13 @@ export default function UserPage() {
       accessorKey: "phoneNumber",
       header: ({ column }: { column: any }) => {
         return (
-          <Button
-            variant="ghost"
+          <div
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex cursor-pointer"
           >
             Phone Number
             <ArrowUpDown className="w-4 h-4 ml-2" />
-          </Button>
+          </div>
         );
       },
     },
@@ -162,13 +206,13 @@ export default function UserPage() {
       accessorKey: "city",
       header: ({ column }: { column: any }) => {
         return (
-          <Button
-            variant="ghost"
+          <div
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex cursor-pointer"
           >
             City
             <ArrowUpDown className="w-4 h-4 ml-2" />
-          </Button>
+          </div>
         );
       },
     },
@@ -197,14 +241,13 @@ export default function UserPage() {
       accessorKey: "type",
       header: ({ column }: { column: any }) => {
         return (
-          <Button
-            variant="ghost"
-            className="p-0"
+          <div
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+            className="flex cursor-pointer"
           >
             User Type
             <ArrowUpDown className="w-4 h-4 ml-2" />
-          </Button>
+          </div>
         );
       },
     },
@@ -222,7 +265,12 @@ export default function UserPage() {
                   <User className="w-4 h-4 mr-2" />
                   <span>View User</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => handleEditUser(row.original)}>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    setEditUser(row.original._id);
+                    setOpenDialog(true);
+                  }}
+                >
                   <Pencil className="w-4 h-4 mr-2" />
                   <span>Edit user</span>
                 </DropdownMenuItem>
@@ -248,20 +296,79 @@ export default function UserPage() {
     },
     onSortingChange: setSorting,
     enableRowSelection: true,
+    getRowId: (row) => row._id,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
-
+  console.log(Object.keys(rowSelection));
   return (
     <div className="">
-      <div className="grid grid-cols-4 gap-2 items-center">
-        <div>1 users</div>
-        <div>1 users</div>
-        <div>1 users</div>
-        <div>1 users</div>
+      <div className="grid grid-cols-4 gap-3 items-center">
+        <div className="p-4  h-[150px] rounded-lg text-black flex items-center justify-center gap-2 border shadow-md">
+          <span className="text-lg">123</span>
+          <UsersRound></UsersRound>
+        </div>
+        <div className="p-4  h-[150px] rounded-lg text-black flex items-center justify-center gap-2 border shadow-md">
+          <span className="text-lg">123</span>
+          <Icon icon="logos:facebook" width={24} height={24} />
+        </div>
+        <div className="p-4  h-[150px] rounded-lg text-black flex items-center justify-center gap-2 border shadow-md">
+          <span className="text-lg">123</span>
+          <Icon icon="devicon:google" width={24} height={24} />
+        </div>
+        <div className="p-4  h-[150px] rounded-lg text-black flex items-center justify-center gap-2 border shadow-md">
+          <span className="text-lg">123</span>
+          <Icon icon="logos:google-gmail" />
+        </div>
       </div>
+
+      <div className="flex items-center gap-2 justify-end flex-wrap mt-4 mb-2">
+        <Input
+          placeholder="Search what you need"
+          className="max-w-[500px]"
+        ></Input>
+        <EditAddUserDialog
+          setOpenDialog={setOpenDialog}
+          open={openDialog}
+          roles={roleOptions}
+          idUser={editUser}
+          setEditUser={setEditUser}
+        ></EditAddUserDialog>
+      </div>
+
+      <div className="my-4 grid grid-cols-12 gap-2 items-center">
+        <MultiSelect
+          options={roleOptions}
+          onChange={setRoleSelected}
+          selected={roleSelected}
+          name="Role"
+          classNameWrapper="col-span-3"
+        ></MultiSelect>
+        <MultiSelect
+          options={roleOptions}
+          onChange={setRoleSelected}
+          selected={roleSelected}
+          name="Role"
+          classNameWrapper="col-span-3"
+        ></MultiSelect>
+        <MultiSelect
+          options={roleOptions}
+          onChange={setRoleSelected}
+          selected={roleSelected}
+          name="Role"
+          classNameWrapper="col-span-3"
+        ></MultiSelect>
+        <MultiSelect
+          options={roleOptions}
+          onChange={setRoleSelected}
+          selected={roleSelected}
+          name="Role"
+          classNameWrapper="col-span-3"
+        ></MultiSelect>
+      </div>
+
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -298,7 +405,11 @@ export default function UserPage() {
           ) : (
             <TableRow>
               <TableCell colSpan={columns?.length} className="h-24 text-center">
-                No results.
+                {data.isLoading ? (
+                  <ComponentsLoading></ComponentsLoading>
+                ) : (
+                  "No results. "
+                )}
               </TableCell>
             </TableRow>
           )}

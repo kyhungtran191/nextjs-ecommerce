@@ -1,20 +1,25 @@
 import { RoleData } from "./role.type";
 
 export type TUser = {
+  _id: string;
   firstName: string;
   lastName: string;
   middleName: string;
   email: string;
   password: string;
-  role?: RoleData;
+  role: RoleData;
   phoneNumber: string;
-  address?: string;
   avatar?: string;
   city?: string;
   status?: number;
   userType?: number;
   addresses?: any[];
 };
+
+export type TUserAdd = Pick<
+  TUser,
+  "email" | "firstName" | "middleName" | "lastName" | "password" | "phoneNumber"
+> & { role: string };
 
 export type UserDataList = {
   users: TUser[];
