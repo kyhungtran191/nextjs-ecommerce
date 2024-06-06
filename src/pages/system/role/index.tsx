@@ -50,6 +50,7 @@ import { PERMISSIONS } from "@/configs/permission";
 import { getAllValueOfObject } from "@/utils/helper";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
 import { usePermission } from "@/hooks/usePermissions";
+import { useQueryRole } from "@/query/useQueryRole";
 
 type RoleData = {
   _id: string;
@@ -89,12 +90,7 @@ export default function RolePage() {
     resolver: yupResolver(schema),
   });
 
-  const roleQueryData = useQuery({
-    queryKey: ["roles"],
-    queryFn: getAllRole,
-    staleTime: 10 * (60 * 1000),
-    cacheTime: 15 * (60 * 1000),
-  });
+  const roleQueryData = useQueryRole();
 
   const queryDetailRole = useQuery({
     queryKey: ["role_detail", selectedRow?._id],
@@ -202,6 +198,7 @@ export default function RolePage() {
       setRoleData(roleQueryData.data?.data.data?.roles || []);
     }
   }, [roleQueryData.data]);
+
   const columns = useMemo(
     () => [
       {
@@ -212,7 +209,6 @@ export default function RolePage() {
         },
         enableSorting: false,
         enableHiding: false,
-        
       },
       {
         id: "action",
