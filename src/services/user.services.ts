@@ -9,7 +9,7 @@ export const createUser = async (body: TUserAdd) =>
 
 export const getAllUser = async (params?: any) =>
   instanceAxios.get<ResponseData<UserDataList>>(`${UserAPI.USER}`, {
-    params: params,
+    params,
   });
 
 export const getDetailUser = async (id: string) => {

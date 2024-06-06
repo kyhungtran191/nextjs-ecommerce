@@ -53,11 +53,13 @@ import {
 } from "@/components/MultiSelect";
 import { useQueryRole } from "@/query/useQueryRole";
 
-import { Label } from "@/components/ui/label";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import EditAddUserDialog from "./components/EditAddUserDialog";
+import { useRouter } from "next/router";
+import { debounce, identity, isUndefined, omit, omitBy, pickBy } from "lodash";
+import { usePathname } from "next/navigation";
+import PaginationCustom from "@/components/PaginationCustom";
 export default function UserPage() {
-  const [viewUser, setViewUser] = useState({});
   const [users, setUsers] = useState<TUser[] | []>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -65,18 +67,64 @@ export default function UserPage() {
   const [roleOptions, setRoleOptions] = useState<OptionType[] | []>([]);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [editUser, setEditUser] = useState<undefined | string>(undefined);
+  const [pageSize, setPageSize] = useState<number>(1);
+  const [status, setStatus] = useState<number>(1);
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = { ...router.query };
+  // queryConfigRoute
+  const queryConfig = pickBy(
+    {
+      limit: params.limit || 8,
+      page: params.page || 1,
+      search: params.search,
+      roleId: params.roleId,
+      status: params.status,
+    },
+    identity
+  );
+
   const data = useQuery({
-    queryKey: ["users"],
-    queryFn: () => getAllUser(),
-    staleTime: 10 * (60 * 1000),
-    cacheTime: 15 * (60 * 1000),
+    queryKey: ["users", queryConfig],
+    queryFn: () => getAllUser(queryConfig),
     onSuccess: (data) => {
       const userData = data?.data.data?.users || [];
       setUsers(userData);
+      setPageSize(Number(data?.data.data?.totalPage));
     },
   });
 
+  useEffect(() => {
+    const parseMultiValue = roleSelected.map((item) => item.value).join("|");
+    if (roleSelected.length > 0) {
+      router.replace({
+        query: { ...queryConfig, roleId: parseMultiValue, page: 1 },
+      });
+    } else {
+      router.replace({
+        query: omit(queryConfig, ["roleId"]),
+      });
+    }
+  }, [roleSelected]);
+
   const roleData = useQueryRole();
+  // Search
+  const onNameChange = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const searchValue = event.target.value;
+      if (searchValue) {
+        router.replace({
+          query: { ...queryConfig, search: searchValue },
+        });
+      } else {
+        router.replace({
+          query: omit(queryConfig, ["search"]),
+        });
+      }
+    },
+    300
+  );
 
   useEffect(() => {
     if (!roleData.data) return;
@@ -111,15 +159,6 @@ export default function UserPage() {
     [users]
   );
 
-  const handleEditUser = (user: TUser) => {
-    // console.log(user);
-    // if (profile.roles === Roles.Manager) {
-    //   if (user.role !== Roles.Coordinator) {
-    //     toast.error("You are not authorized to edit this user");
-    //     return;
-    //   }
-    // }
-  };
   const columns = [
     {
       id: "select",
@@ -158,7 +197,6 @@ export default function UserPage() {
         );
       },
     },
-
     {
       accessorKey: "email",
       header: ({ column }: { column: any }) => {
@@ -302,7 +340,7 @@ export default function UserPage() {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
-  console.log(Object.keys(rowSelection));
+
   return (
     <div className="">
       <div className="grid grid-cols-4 gap-3 items-center">
@@ -328,6 +366,7 @@ export default function UserPage() {
         <Input
           placeholder="Search what you need"
           className="max-w-[500px]"
+          onChange={onNameChange}
         ></Input>
         <EditAddUserDialog
           setOpenDialog={setOpenDialog}
@@ -339,27 +378,6 @@ export default function UserPage() {
       </div>
 
       <div className="my-4 grid grid-cols-12 gap-2 items-center">
-        <MultiSelect
-          options={roleOptions}
-          onChange={setRoleSelected}
-          selected={roleSelected}
-          name="Role"
-          classNameWrapper="col-span-3"
-        ></MultiSelect>
-        <MultiSelect
-          options={roleOptions}
-          onChange={setRoleSelected}
-          selected={roleSelected}
-          name="Role"
-          classNameWrapper="col-span-3"
-        ></MultiSelect>
-        <MultiSelect
-          options={roleOptions}
-          onChange={setRoleSelected}
-          selected={roleSelected}
-          name="Role"
-          classNameWrapper="col-span-3"
-        ></MultiSelect>
         <MultiSelect
           options={roleOptions}
           onChange={setRoleSelected}
@@ -415,6 +433,12 @@ export default function UserPage() {
           )}
         </TableBody>
       </Table>
+
+      <PaginationCustom
+        pathname={pathname}
+        queryConfig={queryConfig}
+        totalPage={pageSize}
+      ></PaginationCustom>
     </div>
   );
 }
