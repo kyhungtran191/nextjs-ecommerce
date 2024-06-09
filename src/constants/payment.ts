@@ -1,11 +1,6 @@
-export const PAYMENT = {
-  PAYMENT_LATER: "PAYMENT_LATER",
-  VN_PAYMENT: "VN_PAYMENT",
-  PAYPAL: "PAYPAL",
-};
+export const PAYMENT_TYPE = ["PAYMENT_LATER", "VN_PAYMENT", "PAYPAL"];
 
-export const enum TPAYMENT {
-  PAYMENT_LATER = "PAYMENT_LATER",
-  VN_PAYMENT = "VN_PAYMENT",
-  PAYPAL = "PAYPAL",
-}
+type TPayment = {
+  label: string;
+  value: string;
+};
