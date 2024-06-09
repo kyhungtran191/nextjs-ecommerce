@@ -39,7 +39,6 @@ import { formatDate, toFullName } from "@/utils/helper";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
 import { Input } from "@/components/ui/input";
 
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { useRouter } from "next/router";
 import { debounce, identity, omit, pickBy } from "lodash";
 import { usePathname } from "next/navigation";
@@ -59,7 +58,6 @@ export default function CityPage() {
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [editCity, setEditCity] = useState<undefined | string>(undefined);
   const [pageSize, setPageSize] = useState<number>(1);
-  const [status, setStatus] = useState<number>(1);
   const queryClient = useQueryClient();
   const router = useRouter();
   const pathname = usePathname();
