@@ -13,7 +13,6 @@ import type { AppProps } from "next/app";
 import { AppProgressBar as ProgressBar } from "next-nprogress-bar";
 // ** Config Imports
 import GuestGuard from "@/components/auth/GuestGuard";
-import FallbackSpinner from "@/components/FallbackSpinner";
 import AuthGuard from "@/components/auth/AuthGuard";
 import AclGuard from "@/components/auth/AclGuard";
 import { defaultACLObj } from "@/configs/acl";
@@ -22,8 +21,6 @@ import { defaultACLObj } from "@/configs/acl";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Poppins } from "next/font/google";
-import GeneralLayout from "@/layout/GeneralLayout";
-import Router from "next/router";
 import { AppContextProvider } from "@/context/app.context";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

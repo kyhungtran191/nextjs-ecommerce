@@ -230,81 +230,78 @@ export default function RolePage() {
     });
   };
 
-  const columns = useMemo(
-    () => [
-      {
-        id: "name",
-        header: () => <p className="">Name</p>,
-        cell: ({ row }: { row: any }) => {
-          return <p className="font-semibold">{row.original.name}</p>;
-        },
-        enableSorting: false,
-        enableHiding: false,
+  const columns = [
+    {
+      id: "name",
+      header: () => <p className="">Name</p>,
+      cell: ({ row }: { row: any }) => {
+        return <p className="font-semibold">{row.original.name}</p>;
       },
-      {
-        id: "action",
-        header: () => <p className="text-center">Action</p>,
-        cell: ({ row }: { row: any }) => {
-          return (
-            <div className="flex items-center gap-3 font-base justify-center">
-              {row.original.permissions.includes("ADMIN.GRANTED") ||
-              row.original.permissions.includes("BASIC.PUBLIC") ? (
-                <LockKeyhole
-                  className="font-normal  flex-shrink-0 cursor-not-allowed"
-                  width={20}
-                  height={20}
-                ></LockKeyhole>
-              ) : (
-                <>
-                  <div
-                    className={`p-2 rounded-full text-white ${
-                      selectedRow?._id == row.original._id
-                        ? "bg-purple text-white"
-                        : "bg-black hover:bg-slate-200 bg-opacity-100"
-                    }  ${!UPDATE ? "hidden" : "block"}`}
-                    onClick={(e) => {
-                      if (!UPDATE) return;
-                      handleEdit(e, row.original);
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      id: "action",
+      header: () => <p className="text-center">Action</p>,
+      cell: ({ row }: { row: any }) => {
+        return (
+          <div className="flex items-center gap-3 font-base justify-center">
+            {row.original.permissions.includes("ADMIN.GRANTED") ||
+            row.original.permissions.includes("BASIC.PUBLIC") ? (
+              <LockKeyhole
+                className="font-normal  flex-shrink-0 cursor-not-allowed"
+                width={20}
+                height={20}
+              ></LockKeyhole>
+            ) : (
+              <>
+                <div
+                  className={`p-2 rounded-full text-white ${
+                    selectedRow?._id == row.original._id
+                      ? "bg-purple text-white"
+                      : "bg-black hover:bg-slate-200 bg-opacity-100"
+                  }  ${!UPDATE ? "hidden" : "block"}`}
+                  onClick={(e) => {
+                    if (!UPDATE) return;
+                    handleEdit(e, row.original);
+                  }}
+                >
+                  <Pencil
+                    className={`font-normal cursor-pointer flex-shrink-0  ${
+                      !UPDATE
+                        ? "!cursor-not-allowed bg-opacity-50"
+                        : "cursor-default bg-opacity-100"
+                    }`}
+                    width={20}
+                    height={20}
+                  ></Pencil>
+                </div>
+                <div
+                  className={`p-2 rounded-full text-white ${
+                    selectedRow?._id == row.original._id
+                      ? "bg-purple text-white"
+                      : "bg-black hover:bg-slate-200 bg-opacity-100"
+                  }  ${!DELETE ? "hidden" : "block"}`}
+                >
+                  <Trash2
+                    className="font-normal cursor-pointer flex-shrink-0"
+                    width={20}
+                    height={20}
+                    onClick={() => {
+                      if (!DELETE) return;
+                      handleDeleteRole(row.original._id);
                     }}
-                  >
-                    <Pencil
-                      className={`font-normal cursor-pointer flex-shrink-0  ${
-                        UPDATE
-                          ? "!cursor-not-allowed bg-opacity-50"
-                          : "cursor-default bg-opacity-100"
-                      }`}
-                      width={20}
-                      height={20}
-                    ></Pencil>
-                  </div>
-                  <div
-                    className={`p-2 rounded-full text-white ${
-                      selectedRow?._id == row.original._id
-                        ? "bg-purple text-white"
-                        : "bg-black hover:bg-slate-200 bg-opacity-100"
-                    }  ${!DELETE ? "hidden" : "block"}`}
-                  >
-                    <Trash2
-                      className="font-normal cursor-pointer flex-shrink-0"
-                      width={20}
-                      height={20}
-                      onClick={() => {
-                        if (!DELETE) return;
-                        handleDeleteRole(row.original._id);
-                      }}
-                    ></Trash2>
-                  </div>
-                </>
-              )}
-            </div>
-          );
-        },
-        enableSorting: false,
-        enableHiding: false,
+                  ></Trash2>
+                </div>
+              </>
+            )}
+          </div>
+        );
       },
-    ],
-    [handleEdit]
-  );
+      enableSorting: false,
+      enableHiding: false,
+    },
+  ];
 
   const roleTable = useReactTable({
     data: roleData,

@@ -50,7 +50,7 @@ export default function PaginationCustom({
     }
   }
   return (
-    <Pagination className={className}>
+    <Pagination className={`${className} ${totalPage ? "flex" : "hidden"}`}>
       <PaginationContent>
         <Link
           href={{
