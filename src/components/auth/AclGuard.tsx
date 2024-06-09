@@ -26,10 +26,10 @@ const AclGuard = (props: AclGuardProps) => {
     authGuard = true,
     permissions,
   } = props;
+
   const { isAuth, user } = useAppContext();
   let ability: any;
   const router = useRouter();
-
   const permissionUser = user?.role?.permissions
     ? user?.role?.permissions?.includes(PERMISSIONS.BASIC)
       ? [PERMISSIONS.DASHBOARD]

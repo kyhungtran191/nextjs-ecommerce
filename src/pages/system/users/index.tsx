@@ -1,13 +1,7 @@
 import AdminDashboard from "@/layout/partials/admin/AdminLayout";
-import { getAllUser, getDetailUser } from "@/services/user.services";
+import { getAllUser } from "@/services/user.services";
 import { useQuery } from "@tanstack/react-query";
-import React, {
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +12,6 @@ import {
 
 import { TUser } from "@/@types/user.type";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
 import {
   ArrowUpDown,
   EllipsisVertical,
@@ -115,7 +108,7 @@ export default function UserPage() {
       const searchValue = event.target.value;
       if (searchValue) {
         router.replace({
-          query: { ...queryConfig, search: searchValue },
+          query: { ...queryConfig, search: searchValue, page: 1 },
         });
       } else {
         router.replace({
@@ -435,7 +428,7 @@ export default function UserPage() {
       </Table>
 
       <PaginationCustom
-      className="mt-3"
+        className="mt-3"
         pathname={pathname}
         queryConfig={queryConfig}
         totalPage={pageSize}
