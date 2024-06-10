@@ -7,7 +7,7 @@ export const toFullName = (
   lastName: string,
   middleName: string,
   firstName: string,
-  language: string 
+  language: string
 ) => {
   if (language === "vi") {
     return `${lastName ? lastName : ""} ${middleName ? middleName : ""} ${
@@ -127,7 +127,6 @@ export const stringToSlug = (str: string) => {
     .trim()
     .replace(/[^a-z0-9\-]/g, "-")
     .replace(/-+/g, "-");
-
   return str;
 };
 

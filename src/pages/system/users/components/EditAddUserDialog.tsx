@@ -36,6 +36,7 @@ import { TUser, TUserAdd } from "@/@types/user.type";
 import { separationFullName, toFullName } from "@/utils/helper";
 import { toast } from "react-toastify";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
+import { Switch } from "@/components/ui/switch";
 
 interface TCreateEditUser {
   open: boolean;
@@ -43,6 +44,7 @@ interface TCreateEditUser {
   idUser?: string;
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
   setEditUser: React.Dispatch<React.SetStateAction<string | undefined>>;
+  refetch: () => void;
 }
 
 type TDefaultValue = {
@@ -62,6 +64,7 @@ export default function EditAddUserDialog({
   setEditUser,
   setOpenDialog,
   idUser,
+  refetch,
 }: TCreateEditUser) {
   const schema = yup.object().shape({
     email: yup
@@ -93,6 +96,7 @@ export default function EditAddUserDialog({
     phoneNumber: "",
     address: "",
     city: "",
+    status: 1,
   };
 
   const {
@@ -106,11 +110,10 @@ export default function EditAddUserDialog({
     defaultValues,
     resolver: yupResolver(schema),
   });
-
   const userDetailData = useQuery({
     queryKey: ["users_detail", idUser],
     queryFn: (_) => getDetailUser(idUser as string),
-    enabled: Boolean(idUser),
+    // enabled: Boolean(idUser),
     onSuccess: (data) => {
       const user = data?.data?.data;
       reset({
@@ -124,6 +127,7 @@ export default function EditAddUserDialog({
         email: user?.email,
         role: user?.role?._id,
         password: "",
+        status: user?.status,
       });
     },
   });
@@ -136,8 +140,6 @@ export default function EditAddUserDialog({
     mutationFn: (body: TUserAdd) => updateUser(body, idUser as string),
   });
 
-  const queryClient = useQueryClient();
-
   const handleForm = (data: TDefaultValue) => {
     let { firstName, lastName, middleName } = separationFullName(
       data.fullName,
@@ -148,6 +150,7 @@ export default function EditAddUserDialog({
         email: data.email,
         password: data.password as string,
         role: data.role as string,
+        status: data.status,
         phoneNumber: data.phoneNumber,
         firstName,
         lastName,
@@ -157,8 +160,9 @@ export default function EditAddUserDialog({
         onSuccess(data) {
           let successMessage = data.data.message;
           toast.success(successMessage);
+          // queryClient.invalidateQueries(["users"]);
+          refetch();
           reset(defaultValues);
-          queryClient.invalidateQueries(["users"]);
           setOpenDialog(false);
         },
         onError(err: any) {
@@ -172,6 +176,7 @@ export default function EditAddUserDialog({
         password: data.password as string,
         role: data.role as string,
         phoneNumber: data.phoneNumber,
+        status: data.status,
         firstName,
         lastName,
         middleName,
@@ -180,8 +185,9 @@ export default function EditAddUserDialog({
         onSuccess(data) {
           let successMessage = data.data.message;
           toast.success(successMessage);
+          // queryClient.invalidateQueries(["users"]);
+          refetch();
           reset(defaultValues);
-          queryClient.invalidateQueries(["users"]);
           setOpenDialog(false);
         },
         onError(err: any) {
@@ -191,7 +197,6 @@ export default function EditAddUserDialog({
       });
     }
   };
-
   return (
     <div>
       <Dialog defaultOpen={open} open={open} onOpenChange={setOpenDialog}>
@@ -306,7 +311,10 @@ export default function EditAddUserDialog({
                     <SelectGroup>
                       {roles &&
                         roles.map((role) => (
-                          <SelectItem value={role.value} key={role.label}>
+                          <SelectItem
+                            value={role.value as string}
+                            key={role.label}
+                          >
                             {role.label}
                           </SelectItem>
                         ))}
@@ -317,7 +325,19 @@ export default function EditAddUserDialog({
                   {errors?.role && errors?.role?.message}
                 </div>
               </div>
-
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="airplane-mode">Status </Label>
+                <Switch
+                  id="airplane-mode"
+                  defaultChecked={getValues("status") == 1}
+                  onCheckedChange={() => {
+                    const currentStatus = getValues("status");
+                    currentStatus == 1
+                      ? setValue("status", 0)
+                      : setValue("status", 1);
+                  }}
+                />
+              </div>
               <DialogFooter>
                 <Button type="submit" className="bg-purple text-white">
                   {idUser ? "Update " : "Add"}

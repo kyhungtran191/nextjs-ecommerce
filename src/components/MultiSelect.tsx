@@ -16,12 +16,12 @@ import {
 
 export type OptionType = {
   label: string;
-  value: string;
+  value: string | number;
 };
 
 export type SelectedType = {
   label: string;
-  value: string;
+  value: string | number;
 };
 
 interface MultiSelectProps {
