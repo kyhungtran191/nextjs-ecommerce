@@ -18,7 +18,13 @@ export type TUser = {
 
 export type TUserAdd = Pick<
   TUser,
-  "email" | "firstName" | "middleName" | "lastName" | "password" | "phoneNumber"
+  | "email"
+  | "firstName"
+  | "middleName"
+  | "lastName"
+  | "password"
+  | "phoneNumber"
+  | "status"
 > & { role: string };
 
 export type UserDataList = {
