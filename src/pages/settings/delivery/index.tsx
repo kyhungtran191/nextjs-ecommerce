@@ -51,6 +51,7 @@ import EditAddDeliveryDialog from "./components/EditAddDeliveryDialog";
 import { TDelivery } from "@/@types/delivery.type";
 import { getAllDelivery } from "@/services/delivery.services";
 import { DELIVERYAPI } from "@/apis/delivery.api";
+import { Button } from "@/components/ui/button";
 export default function DeliveryPage() {
   const [delivery, setDelivery] = useState<TDelivery[] | []>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -104,7 +105,40 @@ export default function DeliveryPage() {
     300
   );
 
-  console.log(delivery);
+  const handleDeleteAll = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const deliveryTypeIds = Object.keys(rowSelection);
+        await instanceAxios
+          .delete<ResponseData<City>>(`${DELIVERYAPI.DELIVERY}/delete-many`, {
+            data: {
+              deliveryTypeIds,
+            },
+          })
+          .then(() => {
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your file has been deleted.",
+              icon: "success",
+            });
+            data.refetch();
+            setRowSelection([]);
+          })
+          .catch((err: any) => {
+            let errMsg = err.response.data.message;
+            toast.error(errMsg);
+          });
+      }
+    });
+  };
 
   const handleDeleteSingleCity = (id: string) => {
     Swal.fire({
@@ -271,7 +305,14 @@ export default function DeliveryPage() {
           setEditDelivery={setEditDelivery}
         ></EditAddDeliveryDialog>
       </div>
-
+      <Button
+        className={`ml-auto my-4 min-w-[100px] ${
+          Object.keys(rowSelection).length > 0 ? "block" : "hidden"
+        }`}
+        onClick={handleDeleteAll}
+      >
+        Delete
+      </Button>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

@@ -136,6 +136,7 @@ export default function EditAddDeliveryDialog({
           onCloseAutoFocus={() => {
             setEditDelivery(undefined);
             setOpenDialog(false);
+            reset(defaultValues);
           }}
         >
           <DialogHeader>

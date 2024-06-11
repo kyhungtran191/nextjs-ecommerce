@@ -56,9 +56,7 @@ export default function EditAddCityDialog({
     handleSubmit,
     control,
     formState: { errors },
-    setValue,
     reset,
-    getValues,
   } = useForm({
     defaultValues,
     resolver: yupResolver(schema),
@@ -132,6 +130,7 @@ export default function EditAddCityDialog({
           onCloseAutoFocus={() => {
             setEditCity(undefined);
             setOpenDialog(false);
+            reset(defaultValues);
           }}
         >
           <DialogHeader>

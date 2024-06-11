@@ -51,6 +51,7 @@ import EditAddPaymentDialog from "./components/EditAddPaymentDialog";
 import { getAllPayments } from "@/services/payment.services";
 import { TPayment } from "@/@types/payment.type";
 import { PAYMENTAPI } from "@/apis/payment.api";
+import { Button } from "@/components/ui/button";
 export default function PaymentPage() {
   const [payment, setPayment] = useState<TPayment[] | []>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -102,7 +103,6 @@ export default function PaymentPage() {
   );
 
   const handleDeleteSingleCity = (id: string) => {
-    console.log(id);
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -122,6 +122,41 @@ export default function PaymentPage() {
               text: "Your file has been deleted.",
               icon: "success",
             });
+          })
+          .catch((err: any) => {
+            let errMsg = err.response.data.message;
+            toast.error(errMsg);
+          });
+      }
+    });
+  };
+
+  const handleDeleteAll = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const paymentTypeIds = Object.keys(rowSelection);
+        await instanceAxios
+          .delete<ResponseData<City>>(`${PAYMENTAPI.PAYMENT}/delete-many`, {
+            data: {
+              paymentTypeIds,
+            },
+          })
+          .then(() => {
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your file has been deleted.",
+              icon: "success",
+            });
+            data.refetch();
+            setRowSelection([]);
           })
           .catch((err: any) => {
             let errMsg = err.response.data.message;
@@ -267,7 +302,14 @@ export default function PaymentPage() {
           setEditPayment={setEditPayment}
         ></EditAddPaymentDialog>
       </div>
-
+      <Button
+        className={`ml-auto my-4 min-w-[100px] ${
+          Object.keys(rowSelection).length > 0 ? "block" : "hidden"
+        }`}
+        onClick={handleDeleteAll}
+      >
+        Delete
+      </Button>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -30,39 +30,39 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
 import {
-  createPayment,
-  getDetailPayment,
-  updatePayment,
-} from "@/services/payment.services";
-import { TPaymentAdd } from "@/@types/payment.type";
-import { PAYMENT_TYPE } from "@/constants/payment";
+  createProductType,
+  getDetailProductType,
+  updateProductType,
+} from "@/services/product-type.services";
+import { TProductTypeAdd } from "@/@types/product-type.type";
+import { stringToSlug } from "@/utils/helper";
 
-interface TCreateEditUser {
+interface TCreateEditType {
   open: boolean;
-  idPayment?: string;
+  idType?: string;
   setOpenDialog: React.Dispatch<React.SetStateAction<boolean>>;
-  setEditPayment: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setEditProductType: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 type TDefaultValue = {
   name: string;
-  type: string;
+  slug: string;
 };
 
-export default function EditAddPaymentDialog({
+export default function EditAddProductTypeDialog({
   open,
-  setEditPayment,
+  setEditProductType,
   setOpenDialog,
-  idPayment,
-}: TCreateEditUser) {
+  idType,
+}: TCreateEditType) {
   const schema = yup.object().shape({
     name: yup.string().required("Required_field"),
-    type: yup.string().required("Required_field"),
+    slug: yup.string().required("Required_field"),
   });
 
   const defaultValues: TDefaultValue = {
     name: "",
-    type: "",
+    slug: "",
   };
 
   const {
@@ -72,46 +72,48 @@ export default function EditAddPaymentDialog({
     setValue,
     reset,
     getValues,
+    watch,
   } = useForm({
     defaultValues,
     resolver: yupResolver(schema),
   });
 
   const userDetailData = useQuery({
-    queryKey: ["payment_detail", idPayment],
-    queryFn: (_) => getDetailPayment(idPayment as string),
-    enabled: Boolean(idPayment),
+    queryKey: ["productTypes_detail", idType],
+    queryFn: (_) => getDetailProductType(idType as string),
+    enabled: Boolean(idType),
     onSuccess: (data) => {
       const payment = data?.data?.data;
       reset({
         name: payment?.name,
-        type: payment?.type,
+        slug: payment?.slug,
       });
     },
   });
 
-  const createPaymentMutation = useMutation({
-    mutationFn: (body: TPaymentAdd) => createPayment(body),
+  const createProductTypeMutation = useMutation({
+    mutationFn: (body: TProductTypeAdd) => createProductType(body),
   });
 
-  const updatePaymentMutation = useMutation({
-    mutationFn: (body: TPaymentAdd) => updatePayment(body, idPayment as string),
+  const updateProductTypeMutation = useMutation({
+    mutationFn: (body: TProductTypeAdd) =>
+      updateProductType(body, idType as string),
   });
 
   const queryClient = useQueryClient();
 
   const handleForm = (data: TDefaultValue) => {
-    if (!idPayment) {
-      const addData: TPaymentAdd = {
+    if (!idType) {
+      const addData: TProductTypeAdd = {
         name: data.name,
-        type: data.type,
+        slug: data.slug,
       };
-      createPaymentMutation.mutate(addData, {
+      createProductTypeMutation.mutate(addData, {
         onSuccess(data) {
           let successMessage = data.data.message;
           toast.success(successMessage);
           reset(defaultValues);
-          queryClient.invalidateQueries(["payment-type"]);
+          queryClient.invalidateQueries(["product_types"]);
           setOpenDialog(false);
         },
         onError(err: any) {
@@ -120,16 +122,16 @@ export default function EditAddPaymentDialog({
         },
       });
     } else {
-      const updatedData: TPaymentAdd = {
+      const updatedData: TProductTypeAdd = {
         name: data.name,
-        type: data.type,
+        slug: data.slug,
       };
-      updatePaymentMutation.mutate(updatedData, {
+      updateProductTypeMutation.mutate(updatedData, {
         onSuccess(data) {
           let successMessage = data.data.message;
           toast.success(successMessage);
           reset(defaultValues);
-          queryClient.invalidateQueries(["payment-type"]);
+          queryClient.invalidateQueries(["product_types"]);
           setOpenDialog(false);
         },
         onError(err: any) {
@@ -139,6 +141,12 @@ export default function EditAddPaymentDialog({
       });
     }
   };
+  const nameValue = watch("name");
+
+  useEffect(() => {
+    const parseSlugValue = stringToSlug(nameValue);
+    setValue("slug", parseSlugValue);
+  }, [nameValue, setValue]);
 
   return (
     <div>
@@ -151,33 +159,33 @@ export default function EditAddPaymentDialog({
         <DialogContent
           className=""
           onCloseAutoFocus={() => {
-            setEditPayment(undefined);
+            setEditProductType(undefined);
             setOpenDialog(false);
             reset(defaultValues);
           }}
         >
           <DialogHeader>
             <DialogTitle className="text-center">
-              {idPayment ? "Update User" : "Add new User"}
+              {idType ? "Update User" : "Add new User"}
             </DialogTitle>
           </DialogHeader>
-          {userDetailData.isLoading && idPayment && (
+          {userDetailData.isLoading && idType && (
             <ComponentsLoading></ComponentsLoading>
           )}
-          {(!userDetailData.isLoading || !idPayment) && (
+          {(!userDetailData.isLoading || !idType) && (
             <form
               className="grid gap-2 py-4"
               onSubmit={handleSubmit(handleForm)}
             >
               <div>
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="name">Product Type</Label>
                 <Controller
                   control={control}
                   name="name"
                   render={({ field }) => (
                     <Input
                       className="px-4 py-6 outline-none text-sm"
-                      placeholder="Payment Name"
+                      placeholder="Product Type Name"
                       {...field}
                     ></Input>
                   )}
@@ -188,36 +196,27 @@ export default function EditAddPaymentDialog({
               </div>
 
               <div>
-                <Label htmlFor="type">Payment Type</Label>
-                <Select
-                  onValueChange={(value) => {
-                    console.log(value);
-                    setValue("type", value);
-                  }}
-                  defaultValue={getValues("type")}
-                >
-                  <SelectTrigger className="">
-                    <SelectValue placeholder="Select Payment Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {PAYMENT_TYPE &&
-                        PAYMENT_TYPE.map((payment) => (
-                          <SelectItem value={payment} key={payment}>
-                            {payment}
-                          </SelectItem>
-                        ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="slug">Slug</Label>
+                <Controller
+                  control={control}
+                  name="slug"
+                  render={({ field }) => (
+                    <Input
+                      className="px-4 py-6 outline-none text-sm bg-slate-300"
+                      disabled
+                      placeholder="Slug"
+                      {...field}
+                    ></Input>
+                  )}
+                />
                 <div className=" text-red-500 text-sm font-medium">
-                  {errors?.type && errors?.type?.message}
+                  {errors?.slug && errors?.slug?.message}
                 </div>
               </div>
 
               <DialogFooter>
                 <Button type="submit" className="bg-purple text-white">
-                  {idPayment ? "Update " : "Add"}
+                  {idType ? "Update " : "Add"}
                 </Button>
               </DialogFooter>
             </form>
