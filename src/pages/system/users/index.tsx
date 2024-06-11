@@ -356,8 +356,10 @@ export default function UserPage() {
         let userIds = Object.keys(rowSelection);
         console.log(JSON.stringify(userIds));
         await instanceAxios
-          .post<ResponseData<TUser>>(`${UserAPI.USER}/delete-many`, {
-            userIds: userIds,
+          .delete<ResponseData<TUser>>(`${UserAPI.USER}/delete-many`, {
+            data: {
+              userIds: userIds,
+            },
           })
           .then(() => {
             Swal.fire({
@@ -366,6 +368,7 @@ export default function UserPage() {
               icon: "success",
             });
             data.refetch();
+            setRowSelection([]);
           })
           .catch((err: any) => {
             let errMsg = err.response.data.message;

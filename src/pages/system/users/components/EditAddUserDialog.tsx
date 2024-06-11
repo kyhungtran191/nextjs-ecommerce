@@ -88,6 +88,8 @@ export default function EditAddUserDialog({
     status: yup.number().nonNullable(),
   });
 
+  console.log(idUser);
+
   const defaultValues: TDefaultValue = {
     password: "",
     fullName: "",
@@ -113,7 +115,7 @@ export default function EditAddUserDialog({
   const userDetailData = useQuery({
     queryKey: ["users_detail", idUser],
     queryFn: (_) => getDetailUser(idUser as string),
-    // enabled: Boolean(idUser),
+    enabled: Boolean(idUser),
     onSuccess: (data) => {
       const user = data?.data?.data;
       reset({
@@ -210,6 +212,7 @@ export default function EditAddUserDialog({
           onCloseAutoFocus={() => {
             setEditUser(undefined);
             setOpenDialog(false);
+            reset(defaultValues);
           }}
         >
           <DialogHeader>

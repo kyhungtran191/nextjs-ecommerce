@@ -35,7 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate, toFullName } from "@/utils/helper";
+import { formatDate } from "@/utils/helper";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
 import { Input } from "@/components/ui/input";
 
@@ -51,6 +51,7 @@ import instanceAxios from "@/configs/axiosInstance";
 import { CityAPI } from "@/apis/city.api";
 import { ResponseData } from "@/@types/message.type";
 import { toast } from "react-toastify";
+import { Button } from "@/components/ui/button";
 export default function CityPage() {
   const [cities, setCities] = useState<City[] | []>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -131,6 +132,41 @@ export default function CityPage() {
     });
   };
 
+  const handleDeleteAll = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const cityIds = Object.keys(rowSelection);
+        await instanceAxios
+          .delete<ResponseData<City>>(`${CityAPI.CITY}/delete-many`, {
+            data: {
+              cityIds,
+            },
+          })
+          .then(() => {
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your file has been deleted.",
+              icon: "success",
+            });
+            data.refetch();
+            setRowSelection([]);
+          })
+          .catch((err: any) => {
+            let errMsg = err.response.data.message;
+            toast.error(errMsg);
+          });
+      }
+    });
+  };
+
   const columns = [
     {
       id: "select",
@@ -163,7 +199,7 @@ export default function CityPage() {
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="flex cursor-pointer"
           >
-            Full Name
+            City Name
             <ArrowUpDown className="w-4 h-4 ml-2" />
           </div>
         );
@@ -237,7 +273,7 @@ export default function CityPage() {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
-
+  const rowSelectLength = Object.keys(rowSelection).length;
   return (
     <div className="">
       <div className="flex items-center gap-2 justify-end flex-wrap mt-4 mb-2">
@@ -253,7 +289,14 @@ export default function CityPage() {
           setEditCity={setEditCity}
         ></EditAddCityDialog>
       </div>
-
+      <Button
+        className={`ml-auto my-4 min-w-[100px] ${
+          rowSelectLength > 0 ? "block" : "hidden"
+        }`}
+        onClick={handleDeleteAll}
+      >
+        Delete
+      </Button>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
