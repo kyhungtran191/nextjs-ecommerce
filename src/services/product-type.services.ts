@@ -28,8 +28,3 @@ export const updateProductType = async (body: { name: string }, id: string) =>
     `${ProductTypesAPI.INDEX}/${id}`,
     body
   );
-
-export const deleteDetailCity = async (id: string) =>
-  instanceAxios.delete<ResponseData<TProductType>>(
-    `${ProductTypesAPI.INDEX}/${id}`
-  );

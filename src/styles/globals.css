@@ -89,3 +89,8 @@
   border-radius: 5px;
   background: #b2b2b2;
 }
+
+/* Custom CKEditor */
+.ck-editor__editable {
+  min-height: 150px;
+}
