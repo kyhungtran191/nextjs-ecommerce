@@ -102,73 +102,6 @@ export default function ProductTypePage() {
     300
   );
 
-  const handleDeleteSingleProductType = (id: string) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        await instanceAxios
-          .delete<ResponseData<TProductType>>(`${ProductTypesAPI.INDEX}/${id}`)
-          .then(() => {
-            queryClient.invalidateQueries(["product_types"]);
-            Swal.fire({
-              title: "Deleted!",
-              text: "Your file has been deleted.",
-              icon: "success",
-            });
-          })
-          .catch((err: any) => {
-            let errMsg = err.response.data.message;
-            toast.error(errMsg);
-          });
-      }
-    });
-  };
-
-  const handleDeleteAll = () => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        const productTypeIds = Object.keys(rowSelection);
-        await instanceAxios
-          .delete<ResponseData<TProductType>>(
-            `${ProductTypesAPI.INDEX}/delete-many`,
-            {
-              data: {
-                productTypeIds,
-              },
-            }
-          )
-          .then(() => {
-            Swal.fire({
-              title: "Deleted!",
-              text: "Your file has been deleted.",
-              icon: "success",
-            });
-            data.refetch();
-            setRowSelection([]);
-          })
-          .catch((err: any) => {
-            let errMsg = err.response.data.message;
-            toast.error(errMsg);
-          });
-      }
-    });
-  };
-
   const columns = [
     {
       id: "select",
@@ -257,14 +190,6 @@ export default function ProductTypePage() {
                   <Pencil className="w-4 h-4 mr-2" />
                   <span>Edit Product Type</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={() => {
-                    handleDeleteSingleProductType(row.original._id);
-                  }}
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  <span>Delete Product Type</span>
-                </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -305,14 +230,7 @@ export default function ProductTypePage() {
           setEditProductType={setEditType}
         ></EditAddProductTypeDialog>
       </div>
-      <Button
-        className={`ml-auto my-4 min-w-[100px] ${
-          rowSelectLength > 0 ? "block" : "hidden"
-        }`}
-        onClick={handleDeleteAll}
-      >
-        Delete
-      </Button>
+
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

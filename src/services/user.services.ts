@@ -18,6 +18,3 @@ export const getDetailUser = async (id: string) => {
 
 export const updateUser = async (body: TUserAdd, id: string) =>
   instanceAxios.put<ResponseData<TUser>>(`${UserAPI.USER}/${id}`, body);
-// export const getAllUser = async()
-// Define delete one
-// Define delete all

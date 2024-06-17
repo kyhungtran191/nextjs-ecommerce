@@ -1,4 +1,21 @@
-type TProduct = {
+export type TProductAdmin = {
+  _id: string;
+  name: string;
+  slug: string;
+  image: string;
+  price: number;
+  countInStock: number;
+  location?: string;
+  discount?: string;
+  description: string;
+  discountStartDate: Date | null;
+  discountEndDate: Date | null;
+  type: string;
+  status: number;
+  createdAt: string;
+};
+
+export type TProductPublic = {
   name: string;
   slug: string;
   image: string;
@@ -19,7 +36,7 @@ type TProduct = {
   updatedAt: string;
 };
 
-type TProductAdd = {
+export type TProductAdd = {
   name: string;
   slug: string;
   image?: string;
@@ -35,8 +52,9 @@ type TProductAdd = {
   status?: number;
 };
 
-export type ProductsDataList = {
-  productTypes: TProduct[];
+// Generic type for Product List (Admin, Public)
+export type ProductsDataList<Data> = {
+  products: Data[];
   totalPage: number;
   totalCount: number;
 };

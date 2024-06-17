@@ -25,7 +25,7 @@ export const convertBase64 = (file: File) =>
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
+    reader.onerror = reject  
   });
 
 export const separationFullName = (fullName: string, language: string) => {
