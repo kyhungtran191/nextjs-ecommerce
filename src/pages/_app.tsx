@@ -25,8 +25,6 @@ import { AppContextProvider } from "@/context/app.context";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AxiosInterceptor } from "@/configs/axiosInstance";
-import { ThemeProvider } from "@/components/theme-provider";
-import Fallback from "@/components/loading/ComponentsLoading";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
 // ** Contexts
 
@@ -90,7 +88,7 @@ export default function App(props: ExtendedAppProps) {
   return (
     <main className={poppins.className}>
       <Head>
-        <title>HShop</title>
+        <title>Furniture Town</title>
       </Head>
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools initialIsOpen={false} />

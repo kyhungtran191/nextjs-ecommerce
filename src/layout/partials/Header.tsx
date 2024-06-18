@@ -8,7 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect } from "react";
 import { toast } from "react-toastify";
-import Logo from "../../../public/logo.png";
+import Logo from "../../../public/logo.svg";
 import { Separator } from "@/components/ui/separator";
 import { useMutation } from "@tanstack/react-query";
 import { logout } from "@/services/auth.services";
@@ -42,29 +42,41 @@ export default function Header() {
   const handleLogout = () => {
     logoutMutation.mutate();
   };
+
+  const arrMenuOptions = [
+    { name: "Seatings", link: "/seatings" },
+    { name: "Outdoors", link: "/outdoors" },
+    { name: "Living", link: "/living" },
+    { name: "Dining", link: "/dining" },
+    { name: "Bedroom", link: "/bed-room" },
+    { name: "Storage", link: "/storage" },
+    { name: "Office", link: "/office" },
+  ];
+
   return (
-    <header className="h-[72px] w-full sticky top-0 left-0 right-0 shadow-md z-30 bg-white text-black ">
-      <nav className="container h-full flex justify-between items-center leading-[72px] relative">
+    <header className="h-[72px] w-full sticky top-0 left-0 right-0 shadow-md z-30 bg-white text-black">
+      <nav className="h-full flex justify-between items-center leading-[72px]  px-20">
         <div className="flex items-center">
           <Link href="/" className="flex items-center justify-center gap-2">
             <Image
               alt="logo"
               src={Logo}
-              width={20}
-              height={20}
-              className="flex-shrink-0 object-cover w-8 h-8 sm:h-16 sm:w-16"
+              width={80}
+              height={72}
+              className="flex-shrink-0 object-cover"
             />
-            <h1 className="text-sm font-bold text-center sm:text-xl">Shop</h1>
           </Link>
         </div>
-        <div className="items-center hidden ml-8 lg:flex absolute left-[50%] -transition-x-1/2">
-          {Array(5)
-            .fill(0)
-            .map((item, index) => (
-              <div className="mx-4" key={index}>
-                {index}
-              </div>
-            ))}
+        <div className="items-center hidden gap-6 lg:flex ">
+          {arrMenuOptions.map((item, index) => (
+            <Link
+              href={item.link}
+              className="font-semibold hover:text-orange-900"
+              key={index}
+            >
+              {item.name}
+            </Link>
+          ))}
         </div>
         <div className="flex items-center gap-x-5">
           <DropdownMenu>
@@ -102,7 +114,6 @@ export default function Header() {
                 <div className="grid gap-4">
                   <div className="space-y-2 hover:bg-slate-100">
                     <h4 className="font-medium leading-none">{user?.email}</h4>
-                    {/* <p className="text-sm text-muted-foreground">Student</p> */}
                     <Separator></Separator>
                   </div>
                   <div className="gap-2 text-slate-700 font-medium">
