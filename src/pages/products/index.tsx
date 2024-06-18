@@ -7,7 +7,6 @@ import CustomBreadCrumb from "@/components/custom-breadcrumb/CustomBreadCrumb";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { SliderCustom } from "./(components)/SliderCustom";
 import ProductImage from "../../../public/dining.jpg";
 import {
   Select,
@@ -20,6 +19,7 @@ import {
 } from "@/components/ui/select";
 import { Star } from "lucide-react";
 import Link from "next/link";
+import SliderCustom from "./(components)/SliderCustom";
 export default function Products() {
   const categoriesList = [
     {

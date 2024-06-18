@@ -53,7 +53,7 @@ const SliderCustom = React.forwardRef(
         {...props}
       >
         <SliderPrimitive.Track className="relative h-1.5 w-full grow overflow-hidden rounded-full bg-primary/20">
-          <SliderPrimitive.Range className="absolute h-full bg-[#f7eed8]" />
+          <SliderPrimitive.Range className="absolute h-full bg-[#[#f7eed8]" />
         </SliderPrimitive.Track>
         {localValues.map((value, index) => (
           <React.Fragment key={index}>
@@ -78,4 +78,4 @@ const SliderCustom = React.forwardRef(
 
 SliderCustom.displayName = SliderPrimitive.Root.displayName;
 
-export { SliderCustom };
+export default SliderCustom;
