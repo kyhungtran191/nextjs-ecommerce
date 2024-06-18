@@ -35,22 +35,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate, formatNumberToLocal, toFullName } from "@/utils/helper";
+import { formatDate, formatNumberToLocal } from "@/utils/helper";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
 import { Input } from "@/components/ui/input";
-import {
-  MultiSelect,
-  OptionType,
-  SelectedType,
-} from "@/components/MultiSelect";
-import { useQueryRole } from "@/query/useQueryRole";
 
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useRouter } from "next/router";
 import { debounce, identity, omit, pickBy } from "lodash";
 import { usePathname } from "next/navigation";
 import PaginationCustom from "@/components/PaginationCustom";
-import { useQueryCities } from "@/query/useQueryCity";
 import { Button } from "@/components/ui/button";
 import Swal from "sweetalert2";
 import instanceAxios from "@/configs/axiosInstance";
@@ -72,8 +65,6 @@ export default function ProductPage() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
 
-  // const [roleOptions, setRoleOptions] = useState<OptionType[] | []>([]);
-  // const [cityOptions, setCityOptions] = useState<OptionType[] | []>([]);
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [editProduct, setEditProduct] = useState<undefined | string>(undefined);
   const [pageSize, setPageSize] = useState<number>(1);
@@ -120,8 +111,6 @@ export default function ProductPage() {
     },
     300
   );
-  const roleData = useQueryRole();
-  const cityData = useQueryCities();
 
   const columns = [
     {
@@ -284,7 +273,11 @@ export default function ProductPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuGroup>
-                <DropdownMenuItem onSelect={() => {}}>
+                <DropdownMenuItem
+                  onSelect={() => {
+                    handleDeleteSingleProduct(row.original._id);
+                  }}
+                >
                   <User className="w-4 h-4 mr-2" />
                   <span>Delete Product</span>
                 </DropdownMenuItem>
@@ -304,7 +297,7 @@ export default function ProductPage() {
       },
     },
   ];
-  // const queryClient = useQueryClient();
+
   const table = useReactTable({
     data: products,
     columns,
@@ -356,6 +349,36 @@ export default function ProductPage() {
       }
     });
   };
+
+  const handleDeleteSingleProduct = (id: string) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await instanceAxios
+          .delete<ResponseData<TProductAdmin>>(`${ProductAPI.ADMIN}/${id}`)
+          .then(() => {
+            data.refetch();
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your file has been deleted.",
+              icon: "success",
+            });
+          })
+          .catch((err: any) => {
+            let errMsg = err.response.data.message;
+            toast.error(errMsg);
+          });
+      }
+    });
+  };
+
   const rowSelectLength = Object.keys(rowSelection).length;
   return (
     <div className="">
@@ -388,7 +411,6 @@ export default function ProductPage() {
         <EditAddProductDialog
           setOpenDialog={setOpenDialog}
           open={openDialog}
-          // roles={roleOptions}
           refetch={data.refetch}
           idProduct={editProduct}
           setEditProduct={setEditProduct}

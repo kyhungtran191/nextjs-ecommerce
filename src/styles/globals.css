@@ -63,6 +63,16 @@
     --input: 217.2 32.6% 17.5%;
     /* --ring: 212.7 26.8% 83.9%; */
   }
+
+  .section {
+    @apply mb-4 md:mb-10 lg:mb-16;
+  }
+  .section-heading {
+    @apply text-black text-xl md:text-3xl text-center font-semibold mb-6;
+  }
+  .section-desc {
+    @apply text-center text-darkGrey font-normal text-base;
+  }
 }
 
 @layer base {
@@ -93,4 +103,33 @@
 /* Custom CKEditor */
 .ck-editor__editable {
   min-height: 150px;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  font-weight: 900;
+  color: black;
+  box-shadow: 0;
+}
+.swiper-slide {
+  transition: opacity 0.5s, transform 0.8s !important; /* Adjust the duration as needed */
+  transform-origin: center center !important;
+}
+.swiper-slide.swiper-slide-prev.slide-product,
+.swiper-slide.swiper-slide-next.slide-product {
+  transform: scale(0.6) !important; /* Adjust the scale value as needed */
+}
+
+.swiper-slide.swiper-slide-active.slide-product {
+  transform: scale(1.6) !important; /* Adjust the scale value as needed */
+}
+
+@media screen and (max-width: 768px) {
+  .swiper-slide.swiper-slide-active.slide-product {
+    transform: scale(1.8) !important; /* Adjust the scale value as needed */
+  }
+  .swiper-slide.swiper-slide-prev.slide-product,
+  .swiper-slide.swiper-slide-next.slide-product {
+    transform: scale(0.6) !important; /* Adjust the scale value as needed */
+  }
 }
