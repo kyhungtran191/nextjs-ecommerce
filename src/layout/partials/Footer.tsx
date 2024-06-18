@@ -1,7 +1,7 @@
 import React from "react";
 export default function Footer() {
   return (
-    <footer className="pb-20 bg-[#383633]">
+    <footer className="pb-20 bg-[#383633] mt-auto">
       <div className=" pt-20 px-10 grid grid-cols-4 gap-10 text-[#f7eed8] items-start justify-items-center">
         <div>
           <div className="font-bold">Shopping Services</div>
