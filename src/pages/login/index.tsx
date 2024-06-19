@@ -6,8 +6,7 @@ import { Controller, useForm } from "react-hook-form";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
 import * as yup from "yup";
-import LoginThumb from "../../../public/login-thumb.jpg";
-import Logo from "../../../public/logo.png";
+import Logo from "../../../public/logo.svg";
 import { EMAIL_REG, PASSWORD_REG } from "@/utils/regex";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/router";
@@ -15,7 +14,6 @@ import { useMutation } from "@tanstack/react-query";
 import { TLogin, User } from "@/@types/auth.type";
 import { login } from "@/services/auth.services";
 import { toast } from "react-toastify";
-import type { AxiosError } from "axios";
 type TDefaultValue = {
   email: string;
   password: string;
@@ -102,7 +100,7 @@ export default function Login() {
           <Image
             src={Logo}
             alt="logo"
-            className="flex-shrink-0 object-cover w-10 h-10 sm:h-20 sm:w-20"
+            className="flex-shrink-0 object-cover w-20 h-18"
           />
         </div>
         <h2 className="mt-12 text-xl font-semibold">Nice to see you again!</h2>

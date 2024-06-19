@@ -20,7 +20,7 @@ const CustomBreadCrumb = ({
   capitalizeLinks,
 }: TBreadCrumbProps) => {
   const paths = usePathname();
-  const pathNames = paths.split("/").filter((path) => path);
+  const pathNames = paths?.split("/")?.filter((path) => path);
 
   return (
     <Breadcrumb>
@@ -28,8 +28,8 @@ const CustomBreadCrumb = ({
         <BreadcrumbItem>
           <BreadcrumbLink href={"/"}>{homeElement}</BreadcrumbLink>
         </BreadcrumbItem>
-        {pathNames.length > 0 && <BreadcrumbSeparator />}
-        {pathNames.map((link, index) => {
+        {pathNames?.length > 0 && <BreadcrumbSeparator />}
+        {pathNames?.map((link, index) => {
           let href = `/${pathNames.slice(0, index + 1).join("/")}`;
           let itemClasses = paths === href ? `font-bold` : "";
           let itemLink = capitalizeLinks

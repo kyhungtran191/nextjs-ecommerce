@@ -17,10 +17,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Star } from "lucide-react";
-import Link from "next/link";
 import SliderCustom from "./(components)/SliderCustom";
+import ProductCard from "./(components)/ProductCard";
 export default function Products() {
+  // Call API category  list later
   const categoriesList = [
     {
       title: "Category",
@@ -187,46 +187,7 @@ export default function Products() {
               {Array(6)
                 .fill(0)
                 .map((item, index) => (
-                  <Link href="#" key={index}>
-                    <Image
-                      src={ProductImage}
-                      alt=""
-                      width="0"
-                      height="0"
-                      className="h-[360px] w-full object-cover rounded-2xl"
-                    ></Image>
-                    <div className="p-2">
-                      <div className="flex items-center justify-between ">
-                        <h2 className="font-medium text-lg">
-                          Nova Bliss Chair
-                        </h2>
-                        <div className="flex items-center font-semibold gap-2">
-                          <p className="text-red-500 line-through text-sm">
-                            $400
-                          </p>
-                          <p className="text-base">$400</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-end gap-1">
-                          <div className="flex items-center">
-                            {Array(5)
-                              .fill(0)
-                              .map((item, index) => (
-                                <Star
-                                  fill="#f7d100"
-                                  strokeWidth={0}
-                                  key={index}
-                                />
-                              ))}
-                          </div>
-                          <span className="text-slate-500 text-sm font-semibold">
-                            (51)
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
+                  <ProductCard key={index}></ProductCard>
                 ))}
             </div>
           </div>
