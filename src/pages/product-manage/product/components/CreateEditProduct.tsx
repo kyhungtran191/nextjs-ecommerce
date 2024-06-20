@@ -201,8 +201,8 @@ export default function EditAddProductDialog({
     price: yup
       .string()
       .required("Required_field")
-      .test("least_count", "least 1k", (value) => {
-        return Number(value) >= 1000;
+      .test("least_count", "least 10", (value) => {
+        return Number(value) >= 10;
       }),
   });
   const [imageProduct, setImageProduct] = useState<string>("");
@@ -255,7 +255,6 @@ export default function EditAddProductDialog({
         type: product?.type,
         status: product?.status,
       });
-      console.log("productStatus", product?.status);
       setStatus(product?.status as number);
     },
   });
@@ -289,10 +288,10 @@ export default function EditAddProductDialog({
           {
             onSuccess: (data) => {
               const successMsg = data.data.message;
-              queryClient.invalidateQueries(["products_admin"]);
               setOpenDialog(false);
               setEditProduct(undefined);
               setImageProduct("");
+              refetch();
               reset(defaultValues);
               toast.success(successMsg);
             },
@@ -323,6 +322,7 @@ export default function EditAddProductDialog({
               queryClient.invalidateQueries(["products_admin"]);
               setOpenDialog(false);
               setImageProduct("");
+              refetch();
               reset(defaultValues);
               toast.success(successMsg);
             },
