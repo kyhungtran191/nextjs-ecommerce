@@ -11,7 +11,7 @@ export default function ProductCard() {
         alt=""
         width="0"
         height="0"
-        className="h-[360px] w-full object-cover rounded-2xl"
+        className="h-[280px] sm:h-[360px] w-full object-cover rounded-2xl"
       ></Image>
       <div className="absolute w-10 h-10 rounded-full bg-[#f5f5f5] flex items-center justify-center top-4 left-4">
         <Heart></Heart>

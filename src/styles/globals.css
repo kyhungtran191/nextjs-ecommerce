@@ -133,3 +133,12 @@
     transform: scale(0.6) !important; /* Adjust the scale value as needed */
   }
 }
+
+/* Container Fluid */
+.container-fluid {
+  width: 100%;
+  padding-right: 20px;
+  padding-left: 20px;
+  margin-right: auto;
+  margin-left: auto;
+}

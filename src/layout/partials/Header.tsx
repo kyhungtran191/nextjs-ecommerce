@@ -68,7 +68,7 @@ export default function Header() {
 
   return (
     <header className="h-[72px] w-full sticky top-0 left-0 right-0 shadow-md z-30 bg-white text-black">
-      <nav className="h-full flex justify-between items-center leading-[72px]  px-20">
+      <nav className="h-full flex justify-between items-center leading-[72px]  container-fluid">
         <div className="flex items-center">
           <Link href="/" className="flex items-center justify-center gap-2">
             <Image
@@ -80,7 +80,7 @@ export default function Header() {
             />
           </Link>
         </div>
-        <div className="items-center hidden gap-6 lg:flex ">
+        <div className="items-center hidden  gap-6 lg:flex ">
           {arrMenuOptions.map((item, index) => (
             <Link
               href={item.link}
@@ -91,7 +91,7 @@ export default function Header() {
             </Link>
           ))}
         </div>
-        <div className="flex items-center gap-x-5">
+        <div className="flex items-center gap-x-2 medium:gap-x-5">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon">

@@ -12,7 +12,7 @@ export default function Slider() {
         loop
         muted
       ></video>
-      <div className="px-20 flex flex-col justify-start w-full h-full">
+      <div className="px-5 medium:px-20 flex flex-col justify-start w-full h-full">
         <div className="absolute top-1/2 -translate-y-1/2">
           <motion.h1
             initial={{ y: 100, opacity: 0 }}

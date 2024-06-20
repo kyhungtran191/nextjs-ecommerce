@@ -22,24 +22,30 @@ import {
 } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductCard from "../(components)/ProductCard";
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 export default function ProductDetail() {
   return (
     <div className="">
-      <div className="grid grid-cols-12 gap-10 items-start">
-        <div className="col-span-7">
-          <Image
-            src={ImageSample}
-            alt="sample"
-            className="w-full h-full object-cover"
-          />
+      <div className="grid grid-cols-12 xl:gap-10 items-start">
+        <div className="col-span-12 medium:col-span-7">
+          <Zoom>
+            <Image
+              src={ImageSample}
+              alt="sample"
+              className="w-full h-[400px] sm:h-[600px] object-cover"
+            />
+          </Zoom>
         </div>
-        <div className="col-span-5 p-10">
+        <div className="col-span-12 medium:col-span-5 p-5 medium:p-10">
           <CustomBreadCrumb
             homeElement="Home"
             capitalizeLinks
           ></CustomBreadCrumb>
           <div className="mt-5">
-            <h1 className="text-5xl font-medium mb-2">Block Nomad Sofa</h1>
+            <h1 className=" text-4xl xl:text-5xl font-medium mb-2">
+              Block Nomad Sofa
+            </h1>
             <div className="flex items-center justify-end">
               <div className="flex items-center gap-2">
                 <div className="flex items-center text-slate-500 text-base">
@@ -62,14 +68,14 @@ export default function ProductDetail() {
                     <Star fill="#f7d100" strokeWidth={0} key={index} />
                   ))}
               </div>
-              <p className="font-bold text-xl">4.9</p>
+              <p className="font-medium text-xl">4.9</p>
               <p className="text-slate-500 font-medium text-sm">140 Reviews</p>
               <div className="h-5 bg-slate-500 w-[2px]"></div>
               <p className="text-slate-500 font-medium text-sm">140 Sold</p>
             </div>
             <div className="flex items-center gap-3 my-3">
-              <h3 className="text-4xl font-bold my-3">$5873</h3>
-              <p className="text-3xl text-slate-500 line-through">$6873</p>
+              <h3 className="text-3xl font-bold my-3">$5873</h3>
+              <p className="text-xl text-slate-500 line-through ">$6873</p>
             </div>
             <div className="flex items-center gap-3 my-3">
               <Select defaultValue="1">
@@ -97,7 +103,7 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
-      <Tabs defaultValue="description" className="w-full mt-5">
+      <Tabs defaultValue="description" className="w-full medium:mt-5">
         <TabsList className="w-full gap-2">
           <TabsTrigger
             value="description"
@@ -118,13 +124,16 @@ export default function ProductDetail() {
             FAQ
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="description" className="p-10">
+        <TabsContent
+          value="description"
+          className="p-5 max-h-[200px] overflow-y-auto"
+        >
           Make changes to your account here.
         </TabsContent>
-        <TabsContent value="reviews" className="p-10">
+        <TabsContent value="reviews" className="p-5">
           Change your password here.
         </TabsContent>
-        <TabsContent value="faq" className="p-10">
+        <TabsContent value="faq" className="p-5 max-h-[500px] overflow-y-auto">
           <Accordion type="single" collapsible className="w-full">
             <AccordionItem value="item-1">
               <AccordionTrigger hidden>Is it accessible?</AccordionTrigger>
@@ -150,16 +159,14 @@ export default function ProductDetail() {
         </TabsContent>
       </Tabs>
       <div className="section">
-        <div className="p-5">
-          <h2 className="section-heading">Similarity Product</h2>
-          <div className="grid grid-cols-4 gap-5">
-            {/* Product Item */}
-            {Array(6)
-              .fill(0)
-              .map((item, index) => (
-                <ProductCard key={index}></ProductCard>
-              ))}
-          </div>
+        <h2 className="section-heading">Similarity Product</h2>
+        <div className="grid gap-5  sm:grid-cols-2 medium:grid-cols-3 xl:grid-cols-4 medium:gap-10 container-fluid">
+          {/* Product Item */}
+          {Array(6)
+            .fill(0)
+            .map((item, index) => (
+              <ProductCard key={index}></ProductCard>
+            ))}
         </div>
       </div>
     </div>
