@@ -22,18 +22,20 @@ export default function Services() {
     },
   ];
   return (
-    <section className="section bg-[#f7eee3] py-14">
+    <section className="section bg-[#f7eee3] py-5 sm:py-14">
       <div className="container">
         <h2 className="section-heading">
           We’re solving the biggest problems in furniture
         </h2>
-        <div className="grid grid-cols-3 gap-10  ">
+        <div className="grid medium:grid-cols-3 gap-5 medium:gap-10">
           {services.map((item) => (
-            <div className="flex my-10 gap-5" key={item.title}>
-              <item.icon className="w-20 h-20 object-cover"></item.icon>
+            <div className="flex my-4 gap-5 items-center" key={item.title}>
+              <item.icon className="w-14 h-14 sm:w-20 sm:h-20 object-cover"></item.icon>
               <div className="flex-1">
                 <h3 className="font-semibold">{item.title}</h3>
-                <p className="text-slate-600 text-sm">{item.description}</p>
+                <p className="text-slate-600 text-sm line-clamp-5">
+                  {item.description}
+                </p>
               </div>
             </div>
           ))}

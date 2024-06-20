@@ -26,7 +26,7 @@ export default function MyCart() {
             Total (2 items): <span>8,218,000 đ</span>
           </div>
           <div className="grid grid-cols-1 medium:grid-cols-10 gap-10">
-            <div className="col-span-1 medium:col-span-6 sm:max-h-auto p-3 max-h-[600px] overflow-auto">
+            <div className="col-span-1 medium:col-span-6 sm:max-h-auto p-3 max-h-[600px] overflow-y-auto">
               {Array(5)
                 .fill(0)
                 .map((item, index) => (

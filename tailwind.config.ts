@@ -10,21 +10,27 @@ const config = {
   ],
   prefix: "",
   theme: {
+    screens: {
+      "2xl": "1400px",
+      sm: "640px",
+      // => @media (min-width: 640px) { ... }
+      medium: "990px",
+      md: "768px",
+      // => @media (min-width: 768px) { ... }
+
+      lg: "1024px",
+      // => @media (min-width: 1024px) { ... }
+
+      xl: "1280px",
+    },
     container: {
       center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-        'sm': '640px',
-        // => @media (min-width: 640px) { ... }
-        'medium':'990px',
-        'md': '768px',
-        // => @media (min-width: 768px) { ... }
-  
-        'lg': '1024px',
-        // => @media (min-width: 1024px) { ... }
-  
-        'xl': '1280px',
+      padding: {
+        DEFAULT: "1rem",
+        sm: "2rem",
+        lg: "4rem",
+        xl: "5rem",
+        "2xl": "6rem",
       },
     },
     extend: {
