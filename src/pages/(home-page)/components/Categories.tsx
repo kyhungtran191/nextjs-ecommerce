@@ -12,32 +12,32 @@ export default function Categories() {
   const categories = [
     {
       title: "Seating",
-      link: "",
+      link: "/products?seating",
       image: Seating,
     },
     {
       title: "Dining",
-      link: "",
+      link: "/products?dining",
       image: Dining,
     },
     {
       title: "Living",
-      link: "",
+      link: "/products?living",
       image: Living,
     },
     {
       title: "Bedroom",
-      link: "",
+      link: "/products?bedroom",
       image: Bedroom,
     },
     {
       title: "Rug",
-      link: "",
+      link: "/products?rug",
       image: Rug,
     },
     {
       title: "Storage",
-      link: "",
+      link: "/products?storage",
       image: Storage,
     },
   ];
@@ -49,7 +49,7 @@ export default function Categories() {
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-5">
           {categories.map((item) => (
             <Link
-              href=""
+              href={item.link}
               className="relative h-[180px] sm:h-[220px] medium:h-[280px] xl:h-[340px] w-full cursor-pointer group"
               key={item.title}
             >

@@ -90,11 +90,9 @@ export default function ProductPage() {
     onSuccess: (data) => {
       const productsData = data?.data.data?.products || [];
       setProducts(productsData ? productsData : []);
-      console.log(data?.data.data?.totalPage);
       setPageSize(Number(data?.data.data?.totalPage));
     },
   });
-
   // Search
   const onNameChange = debounce(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,9 +194,7 @@ export default function ProductPage() {
         );
       },
       cell: ({ row }: { row: any }) => {
-        return (
-          <div className="">{formatNumberToLocal(row.original.price)} VND</div>
-        );
+        return <div className="">${row.original.price}</div>;
       },
     },
     {
@@ -381,107 +377,120 @@ export default function ProductPage() {
 
   const rowSelectLength = Object.keys(rowSelection).length;
   return (
-    <div className="">
-      {/* Product Type Grid */}
-      <div className="grid grid-cols-4 gap-3 items-center">
-        <div className="p-4  h-[150px] rounded-lg text-black flex items-center justify-center gap-2 border shadow-md">
-          <span className="text-lg">123</span>
-          <UsersRound></UsersRound>
-        </div>
-        <div className="p-4  h-[150px] rounded-lg text-black flex items-center justify-center gap-2 border shadow-md">
-          <span className="text-lg">123</span>
-          <Icon icon="logos:facebook" width={24} height={24} />
-        </div>
-        <div className="p-4  h-[150px] rounded-lg text-black flex items-center justify-center gap-2 border shadow-md">
-          <span className="text-lg">123</span>
-          <Icon icon="devicon:google" width={24} height={24} />
-        </div>
-        <div className="p-4  h-[150px] rounded-lg text-black flex items-center justify-center gap-2 border shadow-md">
-          <span className="text-lg">123</span>
-          <Icon icon="logos:google-gmail" />
-        </div>
-      </div>
+    <>
+      {data.isLoading && <ComponentsLoading></ComponentsLoading>}
+      {!data.isLoading && (
+        <div className="">
+          {/* Product Type Grid */}
+          <div className="grid grid-cols-4 gap-3 items-center">
+            <div className="p-4  h-[150px] rounded-lg text-black flex items-center justify-center gap-2 border shadow-md">
+              <span className="text-lg">123</span>
+              <UsersRound></UsersRound>
+            </div>
+            <div className="p-4  h-[150px] rounded-lg text-black flex items-center justify-center gap-2 border shadow-md">
+              <span className="text-lg">123</span>
+              <Icon icon="logos:facebook" width={24} height={24} />
+            </div>
+            <div className="p-4  h-[150px] rounded-lg text-black flex items-center justify-center gap-2 border shadow-md">
+              <span className="text-lg">123</span>
+              <Icon icon="devicon:google" width={24} height={24} />
+            </div>
+            <div className="p-4  h-[150px] rounded-lg text-black flex items-center justify-center gap-2 border shadow-md">
+              <span className="text-lg">123</span>
+              <Icon icon="logos:google-gmail" />
+            </div>
+          </div>
 
-      <div className="flex items-center gap-2 justify-end flex-wrap mt-4 mb-2">
-        <Input
-          placeholder="Search what you need"
-          className="max-w-[500px]"
-          onChange={onNameChange}
-        ></Input>
-        <EditAddProductDialog
-          setOpenDialog={setOpenDialog}
-          open={openDialog}
-          refetch={data.refetch}
-          idProduct={editProduct}
-          setEditProduct={setEditProduct}
-        ></EditAddProductDialog>
-      </div>
+          <div className="flex items-center gap-2 justify-end flex-wrap mt-4 mb-2">
+            <Input
+              placeholder="Search what you need"
+              className="max-w-[500px]"
+              onChange={onNameChange}
+            ></Input>
+            <EditAddProductDialog
+              setOpenDialog={setOpenDialog}
+              open={openDialog}
+              refetch={data.refetch}
+              idProduct={editProduct}
+              setEditProduct={setEditProduct}
+            ></EditAddProductDialog>
+          </div>
 
-      <div className="my-4 grid grid-cols-12 gap-2 items-center">
-        <FilterProductType queryConfig={queryConfig}></FilterProductType>
-        <FilterProductStatus queryConfig={queryConfig}></FilterProductStatus>
-        <Button
-          className={`ml-auto ${rowSelectLength > 0 ? "block" : "hidden"} `}
-          onClick={handleDeleteAll}
-        >
-          Delete
-        </Button>
-      </div>
+          <div className="my-4 grid grid-cols-12 gap-2 items-center">
+            <FilterProductType queryConfig={queryConfig}></FilterProductType>
+            <FilterProductStatus
+              queryConfig={queryConfig}
+            ></FilterProductStatus>
+            <Button
+              className={`ml-auto ${rowSelectLength > 0 ? "block" : "hidden"} `}
+              onClick={handleDeleteAll}
+            >
+              Delete
+            </Button>
+          </div>
 
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table?.getRowModel()?.rows?.length ? (
+                table?.getRowModel()?.rows?.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
                         )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table?.getRowModel()?.rows?.length ? (
-            table?.getRowModel()?.rows?.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columns?.length}
+                    className="h-24 text-center"
+                  >
+                    {data.isLoading ? (
+                      <ComponentsLoading></ComponentsLoading>
+                    ) : (
+                      "No results. "
+                    )}
                   </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns?.length} className="h-24 text-center">
-                {data.isLoading ? (
-                  <ComponentsLoading></ComponentsLoading>
-                ) : (
-                  "No results. "
-                )}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
 
-      <PaginationCustom
-        className="mt-3"
-        pathname={pathname}
-        queryConfig={queryConfig}
-        totalPage={pageSize}
-      ></PaginationCustom>
-    </div>
+          <PaginationCustom
+            className="mt-3"
+            pathname={pathname}
+            queryConfig={queryConfig}
+            totalPage={pageSize}
+          ></PaginationCustom>
+        </div>
+      )}
+    </>
   );
 }
 ProductPage.authGuard = true;
