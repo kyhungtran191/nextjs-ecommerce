@@ -1,5 +1,5 @@
 // ** React Imports
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import "@/styles/globals.css";
 
 // ** Next Imports
@@ -29,7 +29,9 @@ import ComponentsLoading from "@/components/loading/ComponentsLoading";
 // ** Contexts
 
 // ** Global css styles
-
+if (typeof document === "undefined") {
+  React.useLayoutEffect = React.useEffect;
+}
 type ExtendedAppProps = AppProps & {
   Component: NextPage;
 };
@@ -76,6 +78,7 @@ export default function App(props: ExtendedAppProps) {
 
   const permissions = Component.permissions ?? [];
 
+  const title = Component.title ? Component.title : "Furnitown";
   // Query Client (React Query)
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -88,7 +91,7 @@ export default function App(props: ExtendedAppProps) {
   return (
     <main className={poppins.className}>
       <Head>
-        <title>Furniture Town</title>
+        <title>{title}</title>
       </Head>
       <QueryClientProvider client={queryClient}>
         <ReactQueryDevtools initialIsOpen={false} />

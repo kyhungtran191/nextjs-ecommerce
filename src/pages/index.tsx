@@ -7,7 +7,6 @@ import Banner from "./(home-page)/components/Banner";
 import { ReactNode } from "react";
 
 // const inter = Inter({ subsets: ["latin"] });
-
 export default function Home() {
   return (
     <>

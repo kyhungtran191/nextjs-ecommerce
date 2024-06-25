@@ -1,5 +1,5 @@
 import GeneralLayout from "@/layout/GeneralLayout";
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import ChairImage from "../../../public/chair-banner.png";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -7,7 +7,6 @@ import CustomBreadCrumb from "@/components/custom-breadcrumb/CustomBreadCrumb";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import ProductImage from "../../../public/dining.jpg";
 import {
   Select,
   SelectContent,
@@ -31,34 +30,71 @@ import {
 import SliderCustom from "./(components)/SliderCustom";
 import ProductCard from "./(components)/ProductCard";
 import { Button } from "@/components/ui/button";
-export default function Products() {
+import { useRouter } from "next/router";
+import { useSearchParams } from "next/navigation";
+import { identity, pickBy } from "lodash";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getAllProductTypes } from "@/services/product-type.services";
+import { getProductPublic } from "@/services/product-public.services";
+import ComponentsLoading from "@/components/loading/ComponentsLoading";
+
+export default function Products(props: { products: any }) {
+  console.log(props.products);
+
   // Call API category  list later
-  const categoriesList = [
-    {
-      title: "Category",
-      children: [
-        {
-          title: "Seating",
-          link: "/settings/payment",
-        },
-        {
-          title: "Outdoor",
-          link: "/settings/payment",
-        },
-        {
-          title: "Outdoor",
-          link: "/settings/payment",
-        },
-      ],
-    },
-  ];
 
   const [range, setRange] = useState([0, 1000]);
 
   const handleRangeChange = (value: number[]) => {
     setRange(value);
   };
+  const [categoriesSelected, setCategoriesSelected] = useState<string[]>([]);
 
+  const router = useRouter();
+
+  const queryConfig = router.query;
+
+  const typeProduct = useQuery({
+    queryKey: ["product_types"],
+    queryFn: () => getAllProductTypes(queryConfig),
+    staleTime: 60 * 10,
+    cacheTime: 60 * 10 * 10,
+  });
+
+  useEffect(() => {
+    let categoriesString = queryConfig.category as string;
+    setCategoriesSelected(categoriesString?.split("|") || []);
+  }, [queryConfig]);
+
+  console.log("categoryList", categoriesSelected);
+
+  const handleToggleCategory = (id: string) => {
+    if (categoriesSelected?.includes(id)) {
+      const newQueryCategory = categoriesSelected.filter((item) => item != id);
+      setCategoriesSelected(newQueryCategory);
+      return router.push(
+        {
+          query: pickBy(
+            { ...queryConfig, category: newQueryCategory.join("|") },
+            identity
+          ),
+        },
+        undefined,
+        { scroll: false }
+      );
+    } else {
+      const categoryArr = categoriesSelected && Array?.from(categoriesSelected);
+      const newArr = categoryArr?.push(id as string);
+      // setCategoriesSelected(newArr);
+      return router.push(
+        {
+          query: { ...queryConfig, category: categoryArr?.join("|") },
+        },
+        undefined,
+        { scroll: false }
+      );
+    }
+  };
   return (
     <div>
       <div className="container-fluid">
@@ -96,22 +132,24 @@ export default function Products() {
             <div>
               <h3 className="font-bold text-xl">Category</h3>
               <ul className="my-3 ml-2">
-                {Array(6)
-                  .fill(0)
-                  .map((item, index) => (
+                {typeProduct.data?.data?.data?.productTypes.map(
+                  (item, index) => (
                     <li className="flex items-center gap-2 py-1" key={index}>
                       <Checkbox
                         id="settings"
                         className="border-[#f7eed8]"
+                        checked={categoriesSelected?.includes(item._id)}
+                        onCheckedChange={() => handleToggleCategory(item._id)}
                       ></Checkbox>
                       <Label
                         htmlFor="settings"
                         className="text-sm font-bold cursor-pointer"
                       >
-                        Seating
+                        {item.name}
                       </Label>
                     </li>
-                  ))}
+                  )
+                )}
               </ul>
             </div>
             <div>
@@ -119,7 +157,9 @@ export default function Products() {
               <RadioGroup
                 defaultValue="option-one"
                 className="my-2 ml-2"
-                onValueChange={(value) => console.log(value)}
+                onValueChange={(value) => {
+                  router.replace({ query: { ...queryConfig, minStar: value } });
+                }}
               >
                 <div className="flex items-center space-x-2 py-1">
                   <RadioGroupItem
@@ -215,11 +255,15 @@ export default function Products() {
             </div>
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-5">
               {/* Product Item */}
-              {Array(6)
-                .fill(0)
-                .map((item, index) => (
-                  <ProductCard key={index}></ProductCard>
-                ))}
+              {!props.products.length && (
+                <ComponentsLoading></ComponentsLoading>
+              )}
+              {props.products &&
+                Array(6)
+                  .fill(0)
+                  .map((item, index) => (
+                    <ProductCard key={index}></ProductCard>
+                  ))}
             </div>
           </div>
         </section>
@@ -227,6 +271,27 @@ export default function Products() {
     </div>
   );
 }
+export const getServerSideProps = async (context: any) => {
+  // Fetch data from external API
+  const query = context.query;
+  console.log("server side query", query);
+  const queryData = {
+    page: query.page || "1",
+    limit: query.limit || "10",
+    productType: query.category || "",
+    minStar: query.minStar || "",
+    minPrice: query.minPrice || "",
+    maxPrice: query.maxPrice || "",
+    order: query.order || "",
+    search: query.search || "",
+  };
 
+  const data = await getProductPublic(pickBy(queryData, identity));
+  console.log(data.data);
+  // Pass data to the page via props
+  // Test render list
+  return { props: data.data.data };
+};
 Products.authGuard = false;
 Products.getLayout = (page: ReactNode) => <GeneralLayout>{page}</GeneralLayout>;
+Products.title = "Furnitown Product List";
