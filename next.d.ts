@@ -13,5 +13,6 @@ declare module "next" {
     guestGuard?: boolean;
     getLayout?: (page: ReactElement) => ReactNode;
     permissions?: string[];
+    title?: string;
   };
 }

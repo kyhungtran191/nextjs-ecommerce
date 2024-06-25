@@ -67,7 +67,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="h-[72px] w-full sticky top-0 left-0 right-0 shadow-md z-30 bg-white text-black">
+    <header className="h-[72px] w-full fixed bg-transparent top-0 left-0 right-0 shadow-md z-30 bg-white text-black">
       <nav className="h-full flex justify-between items-center leading-[72px]  container-fluid">
         <div className="flex items-center">
           <Link href="/" className="flex items-center justify-center gap-2">
