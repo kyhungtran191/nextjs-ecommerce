@@ -1,5 +1,6 @@
 import { User } from "@/@types/auth.type";
 import { CartItem } from "@/@types/cart.type";
+import { toast } from "react-toastify";
 
 export const LocalStorageEventTarget = new EventTarget();
 
@@ -69,7 +70,12 @@ export const clearLS = () => {
 
 export const setLocalProductToCart = (data: Record<string, CartItem[]>) => {
   if (typeof window !== "undefined") {
-    window.localStorage.setItem("cart", JSON.stringify(data));
+    try {
+      window.localStorage.setItem("cart", JSON.stringify(data));
+    } catch (err) {
+      console.log(err);
+      toast.error("Cart Storage is full");
+    }
   }
 };
 

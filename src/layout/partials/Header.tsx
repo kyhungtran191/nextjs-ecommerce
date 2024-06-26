@@ -10,9 +10,9 @@ import React, { useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import Logo from "../../../public/logo.svg";
 import { Separator } from "@/components/ui/separator";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { logout } from "@/services/auth.services";
-import { clearLS } from "@/utils/auth";
+import { clearLS, getLocalProductCart } from "@/utils/auth";
 import { useRouter } from "next/router";
 import { useAppContext } from "@/context/app.context";
 import { Moon, ShoppingCart, Sun } from "lucide-react";
@@ -38,11 +38,24 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useCartStore } from "@/stores/cart.store";
+import { getAllProductTypes } from "@/services/product-type.services";
+import QuantityController from "@/components/QuantityController";
+import Close from "@/pages/my-cart/(components)/CloseIcon";
 
 export default function Header() {
   const { cart, clearCart } = useCartStore();
   const { setTheme } = useTheme();
   const { setIsAuth, setUser, user, isAuth } = useAppContext();
+
+  const { updateCart } = useCartStore();
+  useEffect(() => {
+    const cartLS = getLocalProductCart();
+    const parseData = cartLS ? JSON.parse(cartLS) : {};
+    if (user?._id) {
+      console.log(parseData);
+      updateCart(parseData[user?._id] ? parseData[user?._id] : []);
+    }
+  }, []);
 
   const logoutMutation = useMutation({
     mutationFn: () => logout(),
@@ -59,24 +72,21 @@ export default function Header() {
     clearCart();
   };
 
-  const arrMenuOptions = [
-    { name: "Seatings", link: "/seatings" },
-    { name: "Outdoors", link: "/outdoors" },
-    { name: "Living", link: "/living" },
-    { name: "Dining", link: "/dining" },
-    { name: "Bedroom", link: "/bed-room" },
-    { name: "Storage", link: "/storage" },
-    { name: "Office", link: "/office" },
-  ];
+  const { data: categoryData } = useQuery({
+    queryKey: ["product_types"],
+    queryFn: () => getAllProductTypes({}),
+    onSuccess: () => {},
+    staleTime: 60 * 10,
+    cacheTime: 60 * 10 * 10,
+  });
 
   const cartLength = useMemo(() => {
-    const totalQuantity = cart.reduce(
+    const totalQuantity = cart?.reduce(
       (sum, currentValue) => (sum += currentValue.amount),
       0
     );
     return totalQuantity;
   }, [cart]);
-  console.log(cartLength);
   return (
     <header className="h-[72px] w-full fixed bg-transparent top-0 left-0 right-0 shadow-md z-30 bg-white text-black">
       <nav className="h-full flex justify-between items-center leading-[72px]  container-fluid">
@@ -92,11 +102,11 @@ export default function Header() {
           </Link>
         </div>
         <div className="items-center hidden  gap-6 lg:flex ">
-          {arrMenuOptions.map((item, index) => (
+          {categoryData?.data?.data?.productTypes.map((item, index) => (
             <Link
-              href={item.link}
+              href={`/products?category=${item._id}`}
               className="font-semibold hover:text-orange-900"
-              key={index}
+              key={item._id}
             >
               {item.name}
             </Link>
@@ -129,24 +139,65 @@ export default function Header() {
               <Button variant="ghost" className="relative">
                 <ShoppingCart></ShoppingCart>
                 <div className="absolute w-5 h-5 bg-red-600 rounded-full top-0 right-1 flex items-center justify-center text-xs text-white">
-                  {cartLength}
+                  {cartLength || 0}
                 </div>
               </Button>
             </SheetTrigger>
-            <SheetContent>
-              <SheetHeader>
-                <SheetTitle className="text-3xl font-bold flex items-end gap-2">
+            <SheetContent className="p-2">
+              <SheetHeader className="">
+                <SheetTitle className="text-3xl font-bold flex items-center gap-2">
                   Cart
                   <span className="text-base text-slate-600 font-medium">
-                    ({cartLength} items)
+                    ({cartLength || 0} items)
                   </span>
                 </SheetTitle>
+                <Button>Check out</Button>
               </SheetHeader>
               <Separator className="my-4" />
-              <div className="text-center text-slate-600 font-medium">
-                Your cart is currently empty
+              {!cartLength && (
+                <div className="text-center text-slate-600 font-medium">
+                  Your cart is currently empty
+                </div>
+              )}
+              <div className="max-h-[90vh] overflow-y-scroll pb-10 px-3">
+                {cartLength > 0 &&
+                  cart.map((item, index) => (
+                    <div
+                      className="flex flex-wrap items-start gap-2 py-2  border-darkGrey"
+                      key={item?.product}
+                    >
+                      <Link
+                        href="/products/1"
+                        className="w-full h-[204px] sm:h-[204px] flex-shrink-0"
+                      >
+                        <Image
+                          src={item?.image}
+                          alt="cart-item"
+                          width={0}
+                          height={0}
+                          className="w-full h-full object-cover rounded-md"
+                        />
+                      </Link>
+                      <div className="w-full sm:flex-1">
+                        <div className="flex justify-between items-center">
+                          <h3 className="text-xl sm:text-2xl text-black font-semibold">
+                            {item?.name}
+                          </h3>
+                          <Close className="cursor-pointer"></Close>
+                        </div>
+                        <p className="text-xl  text-red-600 font-semibold my-2">
+                          {item?.price}$
+                        </p>
+                        <QuantityController
+                          value={item.amount}
+                          defaultValue={item.amount}
+                          classNameWrapper="my-2"
+                        ></QuantityController>
+                      </div>
+                      {index != cart.length - 1 && <Separator></Separator>}
+                    </div>
+                  ))}
               </div>
-              <SheetFooter></SheetFooter>
             </SheetContent>
           </Sheet>
 
