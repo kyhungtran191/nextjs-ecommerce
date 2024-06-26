@@ -1,5 +1,6 @@
 // ** Types
 // ** Libraries
+import { CartItem } from "@/@types/cart.type";
 import { ContentState, EditorState } from "draft-js";
 import htmlToDraft from "html-to-draftjs";
 
@@ -25,7 +26,7 @@ export const convertBase64 = (file: File) =>
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => resolve(reader.result);
-    reader.onerror = reject  
+    reader.onerror = reject;
   });
 
 export const separationFullName = (fullName: string, language: string) => {
@@ -157,6 +158,26 @@ export const cloneDeep = (data: any) => {
     return JSON.parse(JSON.stringify(data));
   } catch (error) {
     return data;
+  }
+};
+
+export const convertAddProduct = (
+  orderProductList: CartItem[],
+  currentItemAdd: CartItem
+) => {
+  try {
+    const cartList: CartItem[] = cloneDeep(orderProductList);
+    const isExisted = cartList.find(
+      (item) => item.product === currentItemAdd.product
+    );
+    if (isExisted) {
+      isExisted.amount += currentItemAdd.amount;
+    } else {
+      cartList.push(currentItemAdd);
+    }
+    return cartList;
+  } catch (err) {
+    return orderProductList;
   }
 };
 

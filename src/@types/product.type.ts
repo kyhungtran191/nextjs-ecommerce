@@ -34,6 +34,8 @@ export type TProductPublic = {
   _id: string;
   createdAt: string;
   updatedAt: string;
+  averageRating: number;
+  totalReviews: number;
 };
 
 export type TProductAdd = {

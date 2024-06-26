@@ -24,15 +24,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductCard from "../(components)/ProductCard";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
-import useDetectIsLoadingSSR from "@/hooks/useDetectIsLoadingSSR";
 import {
-  getDetailProductPublic,
-  getProductPublic,
+  getDetailProductPublicBySlug,
   getRelatedProduct,
 } from "@/services/product-public.services";
 import { TProductPublic } from "@/@types/product.type";
-import { Skeleton } from "@/components/ui/skeleton";
-import ComponentsLoading from "@/components/loading/ComponentsLoading";
 
 type TProps = {
   product: TProductPublic;
@@ -41,8 +37,7 @@ type TProps = {
 
 export default function ProductDetail(props: TProps) {
   const { product, relatedData } = props;
-  console.log(relatedData);
-  const [isLoading, setIsLoading] = useState(true);
+  console.log("product", product);
   const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     setIsClient(true);
@@ -66,10 +61,7 @@ export default function ProductDetail(props: TProps) {
           </Zoom>
         </div>
         <div className="col-span-12 medium:col-span-5 p-5 medium:p-10">
-          <CustomBreadCrumb
-            homeElement="Home"
-            capitalizeLinks
-          ></CustomBreadCrumb>
+          <CustomBreadCrumb homeElement="Home"></CustomBreadCrumb>
           <div className="mt-5">
             <h1 className=" text-4xl xl:text-5xl font-medium mb-2">
               {product.name}
@@ -81,7 +73,7 @@ export default function ProductDetail(props: TProps) {
                   <Eye className="w-5 h-5 mx-1"></Eye>
                 </div>
                 <div className="flex items-center text-slate-500  text-base">
-                  <p>{product.likedBy.length}</p>
+                  <p>{product.totalLikes}</p>
                   <HeartIcon className="w-5 h-5 mx-1"></HeartIcon>
                 </div>
               </div>
@@ -98,8 +90,10 @@ export default function ProductDetail(props: TProps) {
                     <Star fill="#f7d100" strokeWidth={0} key={index} />
                   ))}
               </div>
-              <p className="font-medium text-xl">4.9</p>
-              <p className="text-slate-500 font-medium text-sm">140 Reviews</p>
+              <p className="font-medium text-xl">{product.averageRating}</p>
+              <p className="text-slate-500 font-medium text-sm">
+                {product.totalReviews} Reviews
+              </p>
               <div className="h-5 bg-slate-500 w-[2px]"></div>
               <p className="text-slate-500 font-medium text-sm">140 Sold</p>
             </div>
@@ -215,9 +209,8 @@ export default function ProductDetail(props: TProps) {
  */
 export const getServerSideProps = async (context: any) => {
   // Fetch data from external API
-  const { id } = context.params;
-  console.log(id);
-  const detailData = await getDetailProductPublic(id);
+  const { slug } = context.params;
+  const detailData = await getDetailProductPublicBySlug(slug);
   const relatedData = await getRelatedProduct({
     slug: detailData?.data?.data?.slug,
     limit: 6,
