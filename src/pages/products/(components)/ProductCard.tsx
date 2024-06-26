@@ -6,7 +6,7 @@ import ProductImage from "../../../../public/dining.jpg";
 import { TProductPublic } from "@/@types/product.type";
 export default function ProductCard({ product }: { product: TProductPublic }) {
   return (
-    <Link href={`/products/${product._id}`} className="relative">
+    <Link href={`/products/${product?._id}`} className="relative">
       <Image
         src={product?.image}
         alt=""
@@ -21,7 +21,9 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
         <div className="flex items-center justify-between ">
           <h2 className="font-medium text-lg">{product?.name}</h2>
           <div className="flex items-center font-semibold gap-2">
-            <p className="text-red-500 line-through text-sm">{product.price}</p>
+            <p className="text-red-500 line-through text-sm">
+              {product?.price}
+            </p>
             {/* Fix later */}
             <p className="text-base">$400</p>
           </div>
