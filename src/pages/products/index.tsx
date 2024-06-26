@@ -361,7 +361,6 @@ export const getServerSideProps = async (context: any) => {
     search: query.search || "",
   };
 
-
   const data = await getProductPublic(pickBy(queryData, identity));
   // Pass data to the page via props
   // Test render list

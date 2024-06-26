@@ -1,4 +1,5 @@
 import { User } from "@/@types/auth.type";
+import { CartItem } from "@/@types/cart.type";
 
 export const LocalStorageEventTarget = new EventTarget();
 
@@ -64,6 +65,20 @@ export const clearLS = () => {
   clearRefreshToken();
   clearAccessTokenFromLS();
   clearUserFromLS();
+};
+
+export const setLocalProductToCart = (data: Record<string, CartItem[]>) => {
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem("cart", JSON.stringify(data));
+  }
+};
+
+export const getLocalProductCart = () => {
+  if (typeof window !== "undefined") {
+    return window.localStorage.getItem("cart");
+  }
+
+  return "";
 };
 
 // export const savePermissions = (permissions) => {

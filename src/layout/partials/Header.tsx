@@ -6,7 +6,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import Logo from "../../../public/logo.svg";
 import { Separator } from "@/components/ui/separator";
@@ -37,11 +37,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useCartStore } from "@/stores/cart.store";
 
 export default function Header() {
+  const { cart, clearCart } = useCartStore();
   const { setTheme } = useTheme();
   const { setIsAuth, setUser, user, isAuth } = useAppContext();
-  const router = useRouter();
+
   const logoutMutation = useMutation({
     mutationFn: () => logout(),
     onSuccess() {
@@ -54,6 +56,7 @@ export default function Header() {
   });
   const handleLogout = () => {
     logoutMutation.mutate();
+    clearCart();
   };
 
   const arrMenuOptions = [
@@ -66,6 +69,14 @@ export default function Header() {
     { name: "Office", link: "/office" },
   ];
 
+  const cartLength = useMemo(() => {
+    const totalQuantity = cart.reduce(
+      (sum, currentValue) => (sum += currentValue.amount),
+      0
+    );
+    return totalQuantity;
+  }, [cart]);
+  console.log(cartLength);
   return (
     <header className="h-[72px] w-full fixed bg-transparent top-0 left-0 right-0 shadow-md z-30 bg-white text-black">
       <nav className="h-full flex justify-between items-center leading-[72px]  container-fluid">
@@ -118,7 +129,7 @@ export default function Header() {
               <Button variant="ghost" className="relative">
                 <ShoppingCart></ShoppingCart>
                 <div className="absolute w-5 h-5 bg-red-600 rounded-full top-0 right-1 flex items-center justify-center text-xs text-white">
-                  0
+                  {cartLength}
                 </div>
               </Button>
             </SheetTrigger>
@@ -127,7 +138,7 @@ export default function Header() {
                 <SheetTitle className="text-3xl font-bold flex items-end gap-2">
                   Cart
                   <span className="text-base text-slate-600 font-medium">
-                    (0 items)
+                    ({cartLength} items)
                   </span>
                 </SheetTitle>
               </SheetHeader>

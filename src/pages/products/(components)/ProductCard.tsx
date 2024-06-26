@@ -1,21 +1,66 @@
-import { Heart, Star } from "lucide-react";
+import { Heart, Router, ShoppingCart, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import ProductImage from "../../../../public/dining.jpg";
 import { TProductPublic } from "@/@types/product.type";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { CartItem } from "@/@types/cart.type";
+import { useCartStore } from "@/stores/cart.store";
+import { convertAddProduct } from "@/utils/helper";
 export default function ProductCard({ product }: { product: TProductPublic }) {
+  const { cart, updateCart } = useCartStore();
+
+  const addProductToCart = (item: CartItem) => {
+    const convertedCartItems = convertAddProduct(cart, item);
+    updateCart(convertedCartItems);
+  };
+
   return (
-    <Link href={`/products/${product?._id}`} className="relative">
-      <Image
-        src={product?.image}
-        alt=""
-        width="0"
-        height="0"
-        className="h-[280px] sm:h-[360px] w-full object-cover rounded-2xl"
-      ></Image>
-      <div className="absolute w-10 h-10 rounded-full bg-[#f5f5f5] flex items-center justify-center top-4 left-4">
+    <div className="relative">
+      <Link href={`/products/${product?.slug}`}>
+        <Image
+          src={product?.image}
+          alt=""
+          width="0"
+          height="0"
+          className="h-[280px] sm:h-[360px] w-full object-cover rounded-2xl"
+        ></Image>
+      </Link>
+
+      <div className="absolute w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center top-4 left-4">
         <Heart></Heart>
+      </div>
+      <div
+        className="absolute w-10 h-10 z-50 rounded-full  bg-white shadow-lg flex items-center justify-center top-4 right-4"
+        onClick={(e) => {
+          const mappedItem: CartItem = {
+            name: product.name,
+            amount: 1,
+            discount: product.discount,
+            image: product.image,
+            price: product.price,
+            product: product._id,
+          };
+          e.stopPropagation();
+          e.preventDefault();
+          addProductToCart(mappedItem);
+        }}
+      >
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <ShoppingCart></ShoppingCart>
+            </TooltipTrigger>
+            <TooltipContent className="bg-black text-white  font-semibold">
+              <p>Add to Cart</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <div className="p-2">
         <div className="flex items-center justify-between ">
@@ -41,6 +86,6 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

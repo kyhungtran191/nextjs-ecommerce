@@ -1,13 +1,14 @@
+import { CartItem } from "@/@types/cart.type";
 import { create } from "zustand";
 
 interface CartState {
-  cart: any[];
-  updateCart: () => void;
-  clearCarat: () => void;
+  cart: CartItem[];
+  updateCart: (ordersItem: CartItem[]) => void;
+  clearCart: () => void;
 }
 
-export const useCartState = create<CartState>((set) => ({
+export const useCartStore = create<CartState>((set) => ({
   cart: [],
-  updateCart: () => {},
-  clearCarat: () => {},
+  updateCart: (ordersItem: CartItem[]) => set(() => ({ cart: ordersItem })),
+  clearCart: () => set(() => ({ cart: [] })),
 }));
