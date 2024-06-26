@@ -32,41 +32,49 @@ import ProductCard from "./(components)/ProductCard";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
-import { identity, pickBy } from "lodash";
+import { debounce, identity, omit, pickBy } from "lodash";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAllProductTypes } from "@/services/product-type.services";
 import { getProductPublic } from "@/services/product-public.services";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
+import useDetectIsLoadingSSR from "@/hooks/useDetectIsLoadingSSR";
+import SkeletonCard from "@/components/SkeletonCard";
+import { TProductPublic } from "@/@types/product.type";
+import PaginationCustom from "@/components/PaginationCustom";
 
-export default function Products(props: { products: any }) {
-  console.log(props.products);
-
+type TProps = {
+  products: TProductPublic[];
+  totalPage: number;
+  totalCount: number;
+};
+export default function Products(props: TProps) {
   // Call API category  list later
-
+  const { products, totalCount, totalPage } = props;
   const [range, setRange] = useState([0, 1000]);
 
-  const handleRangeChange = (value: number[]) => {
-    setRange(value);
-  };
   const [categoriesSelected, setCategoriesSelected] = useState<string[]>([]);
+  const [isFirstRender, setIsFirstRender] = useState(false);
 
   const router = useRouter();
 
+  // Loading
+  const { isLoading } = useDetectIsLoadingSSR();
+
   const queryConfig = router.query;
 
+  useEffect(() => {
+    let categoryList = (queryConfig.category as string)?.split("|");
+    setCategoriesSelected(categoryList || []);
+  }, [queryConfig.category]);
   const typeProduct = useQuery({
     queryKey: ["product_types"],
     queryFn: () => getAllProductTypes(queryConfig),
+    onSuccess: () => {
+      setIsFirstRender(true);
+    },
     staleTime: 60 * 10,
     cacheTime: 60 * 10 * 10,
   });
-
-  useEffect(() => {
-    let categoriesString = queryConfig.category as string;
-    setCategoriesSelected(categoriesString?.split("|") || []);
-  }, [queryConfig]);
-
-  console.log("categoryList", categoriesSelected);
 
   const handleToggleCategory = (id: string) => {
     if (categoriesSelected?.includes(id)) {
@@ -75,7 +83,7 @@ export default function Products(props: { products: any }) {
       return router.push(
         {
           query: pickBy(
-            { ...queryConfig, category: newQueryCategory.join("|") },
+            { ...queryConfig, page: 1, category: newQueryCategory.join("|") },
             identity
           ),
         },
@@ -83,18 +91,53 @@ export default function Products(props: { products: any }) {
         { scroll: false }
       );
     } else {
-      const categoryArr = categoriesSelected && Array?.from(categoriesSelected);
-      const newArr = categoryArr?.push(id as string);
-      // setCategoriesSelected(newArr);
+      const categoryArr = categoriesSelected && Array.from(categoriesSelected);
+      categoryArr.push(id);
+      setCategoriesSelected(categoryArr);
       return router.push(
         {
-          query: { ...queryConfig, category: categoryArr?.join("|") },
+          query: { ...queryConfig, page: 1, category: categoryArr?.join("|") },
         },
         undefined,
         { scroll: false }
       );
     }
   };
+
+  const handleRangeChange = debounce((value: number[]) => {
+    setRange(value);
+    return router.push(
+      {
+        query: {
+          ...queryConfig,
+          page: 1,
+          minPrice: value[0],
+          maxPrice: value[1],
+        },
+      },
+      undefined,
+      { scroll: false }
+    );
+  }, 1500);
+
+  // Handle clear filter option
+  const handleClearFilter = () => {
+    const query = omit(queryConfig, [
+      "category",
+      "minStar",
+      "minPrice",
+      "maxPrice",
+    ]);
+    setRange([0, 0]);
+    return router.push(
+      {
+        query,
+      },
+      undefined,
+      { scroll: false }
+    );
+  };
+
   return (
     <div>
       <div className="container-fluid">
@@ -127,9 +170,9 @@ export default function Products(props: { products: any }) {
           homeElement={"Home"}
           capitalizeLinks
         ></CustomBreadCrumb>
-        <section className="my-5 grid grid-cols-1 medium:grid-cols-[250px_minmax(500px,_1fr)] gap-[20px]  medium:gap-[40px]">
-          <div className="bg-[#383633] shadow-md min-h-[500px] p-4 text-[#f7eed8] rounded-lg  hidden medium:block ">
-            <div>
+        <section className="my-5 grid grid-cols-1 medium:grid-cols-[250px_minmax(500px,_1fr)] gap-[20px] items-start medium:gap-[40px]">
+          <div className="bg-[#383633] shadow-md min-h-screen p-4 text-[#f7eed8] rounded-lg  hidden medium:block col-span-[250px]">
+            <div className="">
               <h3 className="font-bold text-xl">Category</h3>
               <ul className="my-3 ml-2">
                 {typeProduct.data?.data?.data?.productTypes.map(
@@ -215,6 +258,12 @@ export default function Products(props: { products: any }) {
                 formatLabel={(value) => `${value}$`}
               />
             </div>
+            <Button
+              className="bg-black mt-5 w-full hover:bg-black/40"
+              onClick={handleClearFilter}
+            >
+              Clear Filter
+            </Button>
           </div>
           <div>
             <div className="flex items-center justify-between mb-4 flex-wrap">
@@ -240,31 +289,58 @@ export default function Products(props: { products: any }) {
                   </DrawerContent>
                 </Drawer>
                 <div className="text-base font-medium">Sort By</div>
-                <Select>
+                <Select
+                  onValueChange={(value) => {
+                    router.push(
+                      {
+                        query: pickBy(
+                          {
+                            ...queryConfig,
+                            order: value,
+                          },
+                          identity
+                        ),
+                      },
+                      undefined,
+                      { scroll: false }
+                    );
+                  }}
+                >
                   <SelectTrigger className="w-[180px] border-none bg-slate-200/50 font-semibold">
                     <SelectValue placeholder="Options" />
                   </SelectTrigger>
                   <SelectContent className="font-semibold">
-                    <SelectItem value="selling">Best selling</SelectItem>
-                    <SelectItem value="newest">Newest</SelectItem>
-                    <SelectItem value="views">Most Views</SelectItem>
-                    <SelectItem value="likes">Most Likes</SelectItem>
+                    <SelectItem value="sold desc">Best selling</SelectItem>
+                    <SelectItem value="createdAt desc">Newest</SelectItem>
+                    <SelectItem value="views desc">Most Views</SelectItem>
+                    <SelectItem value="totalLikes desc">Most Likes</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-5">
               {/* Product Item */}
-              {!props.products.length && (
-                <ComponentsLoading></ComponentsLoading>
-              )}
-              {props.products &&
+              {isLoading &&
                 Array(6)
                   .fill(0)
                   .map((item, index) => (
-                    <ProductCard key={index}></ProductCard>
+                    <SkeletonCard key={index}></SkeletonCard>
                   ))}
+              {!isLoading &&
+                products.map((item, index) => (
+                  <ProductCard product={item} key={item._id}></ProductCard>
+                ))}
+              {!isLoading && !products.length && (
+                <div className="text-center col-span-3 font-bold text-black">
+                  No Data...
+                </div>
+              )}
             </div>
+            <PaginationCustom
+              queryConfig={queryConfig}
+              pathname={router.pathname}
+              totalPage={totalPage}
+            ></PaginationCustom>
           </div>
         </section>
       </div>
@@ -274,20 +350,19 @@ export default function Products(props: { products: any }) {
 export const getServerSideProps = async (context: any) => {
   // Fetch data from external API
   const query = context.query;
-  console.log("server side query", query);
   const queryData = {
-    page: query.page || "1",
-    limit: query.limit || "10",
+    page: query.page || 1,
+    limit: query.limit || 6,
     productType: query.category || "",
-    minStar: query.minStar || "",
+    minStar: Number(query.minStar) || "",
     minPrice: query.minPrice || "",
     maxPrice: query.maxPrice || "",
     order: query.order || "",
     search: query.search || "",
   };
 
+
   const data = await getProductPublic(pickBy(queryData, identity));
-  console.log(data.data);
   // Pass data to the page via props
   // Test render list
   return { props: data.data.data };

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -9,6 +10,7 @@ import {
 } from "./ui/pagination";
 
 const RANGE = 2;
+
 export default function PaginationCustom({
   pathname,
   queryConfig,
@@ -20,35 +22,47 @@ export default function PaginationCustom({
   totalPage: number;
   className?: string;
 }) {
-  const page = Number(queryConfig.page);
+  const [isClient, setIsClient] = useState(false);
+  const [page, setPage] = useState(Number(queryConfig.page) || 0);
   let dotAfter = false;
   let dotBefore = false;
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   function renderDotAfter(index: number) {
     if (!dotAfter) {
       dotAfter = true;
       return (
-        <span
-          key={index}
+        <li
+          key={`dot-after-${index}`}
           className="px-3 py-2 mx-2 bg-white border rounded shadow-sm cursor-pointer"
         >
           ...
-        </span>
+        </li>
       );
     }
   }
+
   function renderDotBefore(index: number) {
     if (!dotBefore) {
       dotBefore = true;
       return (
-        <span
-          key={index}
+        <li
+          key={`dot-before-${index}`}
           className="px-3 py-2 mx-2 bg-white border rounded shadow-sm cursor-pointer"
         >
           ...
-        </span>
+        </li>
       );
     }
   }
+
+  if (!isClient) {
+    return null; // Avoid rendering on the server to prevent hydration issues
+  }
+
   return (
     <Pagination className={`${className} ${totalPage ? "flex" : "hidden"}`}>
       <PaginationContent>
@@ -104,6 +118,7 @@ export default function PaginationCustom({
                     page: pageNumber,
                   },
                 }}
+                onClick={() => setPage(pageNumber)}
                 key={index}
               >
                 <PaginationItem>

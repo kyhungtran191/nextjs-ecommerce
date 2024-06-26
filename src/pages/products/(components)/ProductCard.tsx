@@ -3,11 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import ProductImage from "../../../../public/dining.jpg";
-export default function ProductCard() {
+import { TProductPublic } from "@/@types/product.type";
+export default function ProductCard({ product }: { product: TProductPublic }) {
   return (
-    <Link href="#" className="relative">
+    <Link href={`/products/${product?._id}`} className="relative">
       <Image
-        src={ProductImage}
+        src={product?.image}
         alt=""
         width="0"
         height="0"
@@ -18,9 +19,12 @@ export default function ProductCard() {
       </div>
       <div className="p-2">
         <div className="flex items-center justify-between ">
-          <h2 className="font-medium text-lg">Nova Bliss Chair</h2>
+          <h2 className="font-medium text-lg">{product?.name}</h2>
           <div className="flex items-center font-semibold gap-2">
-            <p className="text-red-500 line-through text-sm">$400</p>
+            <p className="text-red-500 line-through text-sm">
+              {product?.price}
+            </p>
+            {/* Fix later */}
             <p className="text-base">$400</p>
           </div>
         </div>

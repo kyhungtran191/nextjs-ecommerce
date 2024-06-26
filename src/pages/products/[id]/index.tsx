@@ -1,6 +1,6 @@
 import GeneralLayout from "@/layout/GeneralLayout";
 import Image from "next/image";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import ImageSample from "../../../../public/bedroom.jpg";
 import CustomBreadCrumb from "@/components/custom-breadcrumb/CustomBreadCrumb";
 import { Eye, HeartIcon, Star } from "lucide-react";
@@ -24,14 +24,42 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductCard from "../(components)/ProductCard";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
-export default function ProductDetail() {
+import useDetectIsLoadingSSR from "@/hooks/useDetectIsLoadingSSR";
+import {
+  getDetailProductPublic,
+  getProductPublic,
+  getRelatedProduct,
+} from "@/services/product-public.services";
+import { TProductPublic } from "@/@types/product.type";
+import { Skeleton } from "@/components/ui/skeleton";
+import ComponentsLoading from "@/components/loading/ComponentsLoading";
+
+type TProps = {
+  product: TProductPublic;
+  relatedData: TProductPublic[];
+};
+
+export default function ProductDetail(props: TProps) {
+  const { product, relatedData } = props;
+  console.log(relatedData);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null; // Avoid rendering on the server to prevent hydration issues
+  }
   return (
-    <div className="">
+    <div className="py-10 min-h-screen">
       <div className="grid grid-cols-12 xl:gap-10 items-start">
         <div className="col-span-12 medium:col-span-7">
           <Zoom>
             <Image
-              src={ImageSample}
+              src={product.image}
+              width={0}
+              height={0}
               alt="sample"
               className="w-full h-[400px] sm:h-[600px] object-cover"
             />
@@ -44,22 +72,24 @@ export default function ProductDetail() {
           ></CustomBreadCrumb>
           <div className="mt-5">
             <h1 className=" text-4xl xl:text-5xl font-medium mb-2">
-              Block Nomad Sofa
+              {product.name}
             </h1>
             <div className="flex items-center justify-end">
               <div className="flex items-center gap-2">
                 <div className="flex items-center text-slate-500 text-base">
-                  <p>1</p>
+                  <p>{product.views}</p>
                   <Eye className="w-5 h-5 mx-1"></Eye>
                 </div>
                 <div className="flex items-center text-slate-500  text-base">
-                  <p>1</p>
+                  <p>{product.likedBy.length}</p>
                   <HeartIcon className="w-5 h-5 mx-1"></HeartIcon>
                 </div>
               </div>
               <div></div>
             </div>
-            <h3 className="text-xl font-bold mb-2">Category</h3>
+            <h3 className="text-xl font-bold mb-2">
+              {(product.type as any).name}
+            </h3>
             <div className="flex items-center gap-3 my-3">
               <div className="flex items-center">
                 {Array(5)
@@ -74,8 +104,10 @@ export default function ProductDetail() {
               <p className="text-slate-500 font-medium text-sm">140 Sold</p>
             </div>
             <div className="flex items-center gap-3 my-3">
-              <h3 className="text-3xl font-bold my-3">$5873</h3>
-              <p className="text-xl text-slate-500 line-through ">$6873</p>
+              <h3 className="text-3xl font-bold my-3">${product.price}</h3>
+              <p className="text-xl text-slate-500 line-through ">
+                ${product.price}
+              </p>
             </div>
             <div className="flex items-center gap-3 my-3">
               <Select defaultValue="1">
@@ -93,7 +125,7 @@ export default function ProductDetail() {
                 </SelectContent>
               </Select>
               <div className="font-semibold text-slate-500 text-sm">
-                500 Available
+                {product.countInStock} Available
               </div>
             </div>
             <div className="flex items-center gap-2 my-10">
@@ -126,9 +158,9 @@ export default function ProductDetail() {
         </TabsList>
         <TabsContent
           value="description"
-          className="p-5 max-h-[200px] overflow-y-auto"
+          className="px-5 py-6 max-h-[300px] overflow-y-auto"
         >
-          Make changes to your account here.
+          <div dangerouslySetInnerHTML={{ __html: product.description }} />
         </TabsContent>
         <TabsContent value="reviews" className="p-5">
           Change your password here.
@@ -161,12 +193,9 @@ export default function ProductDetail() {
       <div className="section">
         <h2 className="section-heading">Similarity Product</h2>
         <div className="grid gap-5  sm:grid-cols-2 medium:grid-cols-3 xl:grid-cols-4 medium:gap-10 container-fluid">
-          {/* Product Item */}
-          {Array(6)
-            .fill(0)
-            .map((item, index) => (
-              <ProductCard key={index}></ProductCard>
-            ))}
+          {relatedData.map((item, index) => (
+            <ProductCard product={item} key={item._id}></ProductCard>
+          ))}
         </div>
       </div>
     </div>
@@ -184,6 +213,25 @@ export default function ProductDetail() {
  * 3. HDBQ
 
  */
+export const getServerSideProps = async (context: any) => {
+  // Fetch data from external API
+  const { id } = context.params;
+  console.log(id);
+  const detailData = await getDetailProductPublic(id);
+  const relatedData = await getRelatedProduct({
+    slug: detailData?.data?.data?.slug,
+    limit: 6,
+    page: 1,
+    order: "created desc",
+  });
+
+  return {
+    props: {
+      product: detailData.data.data,
+      relatedData: relatedData.data.data?.products,
+    },
+  };
+};
 ProductDetail.authGuard = false;
 ProductDetail.getLayout = (page: ReactNode) => (
   <GeneralLayout>{page}</GeneralLayout>
