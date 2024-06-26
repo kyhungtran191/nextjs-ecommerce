@@ -12,12 +12,34 @@ import {
 import { CartItem } from "@/@types/cart.type";
 import { useCartStore } from "@/stores/cart.store";
 import { convertAddProduct } from "@/utils/helper";
+import { useAppContext } from "@/context/app.context";
+import { getLocalProductCart, setLocalProductToCart } from "@/utils/auth";
+import { useRouter } from "next/router";
 export default function ProductCard({ product }: { product: TProductPublic }) {
   const { cart, updateCart } = useCartStore();
-
+  const { user } = useAppContext();
+  const router = useRouter();
   const addProductToCart = (item: CartItem) => {
+    if (!user?._id) {
+      if (router.asPath !== "/" && router.asPath !== "/login") {
+        return router.replace({
+          pathname: "/login",
+          query: { returnUrl: router.asPath },
+        });
+      } else {
+        return router.replace("/login");
+      }
+    }
+    const cartLS = getLocalProductCart();
+    console.log("Cart Item", item);
+    const parseCart = cartLS ? JSON.parse(cartLS) : {};
     const convertedCartItems = convertAddProduct(cart, item);
+    console.log(convertedCartItems);
     updateCart(convertedCartItems);
+    console.log("cartParse", parseCart);
+    if (user?._id) {
+      setLocalProductToCart({ ...parseCart, [user._id]: convertedCartItems });
+    }
   };
 
   return (
@@ -36,7 +58,7 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
         <Heart></Heart>
       </div>
       <div
-        className="absolute w-10 h-10 z-50 rounded-full  bg-white shadow-lg flex items-center justify-center top-4 right-4"
+        className="absolute w-10 h-10  rounded-full  bg-white shadow-lg flex items-center justify-center top-4 right-4"
         onClick={(e) => {
           const mappedItem: CartItem = {
             name: product.name,

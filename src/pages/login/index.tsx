@@ -19,11 +19,13 @@ type TDefaultValue = {
   password: string;
 };
 import {
+  getLocalProductCart,
   saveAccessTokenToLS,
   saveRefreshTokenToLS,
   saveUserToLS,
 } from "@/utils/auth";
 import { useAppContext } from "@/context/app.context";
+import { useCartStore } from "@/stores/cart.store";
 
 export default function Login() {
   const { setIsAuth, setUser } = useAppContext();
@@ -59,10 +61,19 @@ export default function Login() {
     mode: "onBlur",
     resolver: yupResolver(schema),
   });
-
+  const { updateCart } = useCartStore();
   const onSubmit = (data: { email: string; password: string }) => {
     loginMutation.mutate(data, {
       onSuccess(data) {
+        const cartLS = getLocalProductCart();
+        const parseData = cartLS ? JSON.parse(cartLS) : {};
+        if (data.data.data?.user?._id) {
+          updateCart(
+            parseData[data.data.data?.user?._id]
+              ? parseData[data.data.data?.user?._id]
+              : []
+          );
+        }
         let currenData = data?.data?.data;
         saveAccessTokenToLS(currenData?.access_token as string);
         saveRefreshTokenToLS(currenData?.refresh_token as string);

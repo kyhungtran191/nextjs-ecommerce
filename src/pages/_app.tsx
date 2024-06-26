@@ -6,6 +6,7 @@ import "@/styles/globals.css";
 import Head from "next/head";
 import type { NextPage } from "next";
 import type { AppProps } from "next/app";
+import localforage from "localforage";
 
 // ** Store Imports
 
@@ -65,6 +66,11 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
 });
 
+const persistConfig = {
+  key: "root",
+  storage: localforage,
+};
+
 export default function App(props: ExtendedAppProps) {
   const { Component, pageProps } = props;
 
@@ -108,8 +114,8 @@ export default function App(props: ExtendedAppProps) {
                 {getLayout(<Component {...pageProps} />)}
                 <ProgressBar
                   height="2px"
-                  color="purple"
-                  options={{ showSpinner: false }}
+                  color="#c3b1ff"
+                  options={{ showSpinner: true }}
                   shallowRouting
                 />
               </AclGuard>
