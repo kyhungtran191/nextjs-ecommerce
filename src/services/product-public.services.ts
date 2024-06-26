@@ -1,5 +1,5 @@
 import { ResponseData } from "@/@types/message.type";
-import { TProductPublic } from "@/@types/product.type";
+import { ProductsDataList, TProductPublic } from "@/@types/product.type";
 import { ProductAPI } from "@/apis/product.api";
 import axios from "axios";
 
@@ -11,9 +11,10 @@ export const getProductPublic = async (params: any) =>
 export const getDetailProductPublic = async (id: string) =>
   axios.get<ResponseData<TProductPublic>>(`${ProductAPI.PUBLIC}/${id}`);
 
-export const getRelatedProduct = async (slug: string) =>
-  axios.get<ResponseData<TProductPublic[]>>(`${ProductAPI.PUBLIC}/related`, {
-    params: {
-      slug,
-    },
-  });
+export const getRelatedProduct = async (params: any) =>
+  axios.get<ResponseData<ProductsDataList<TProductPublic>>>(
+    `${ProductAPI.RELATED}`,
+    {
+      params,
+    }
+  );
