@@ -163,7 +163,8 @@ export const cloneDeep = (data: any) => {
 
 export const convertAddProduct = (
   orderProductList: CartItem[],
-  currentItemAdd: CartItem
+  currentItemAdd: CartItem,
+  isType?: boolean
 ) => {
   try {
     const cartList: CartItem[] = cloneDeep(orderProductList);
@@ -171,7 +172,11 @@ export const convertAddProduct = (
       (item) => item.product === currentItemAdd.product
     );
     if (isExisted) {
-      isExisted.amount += currentItemAdd.amount;
+      if (isType) {
+        isExisted.amount = currentItemAdd.amount;
+      } else {
+        isExisted.amount += currentItemAdd.amount;
+      }
     } else {
       cartList.push(currentItemAdd);
     }

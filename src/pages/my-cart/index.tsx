@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import GeneralLayout from "@/layout/GeneralLayout";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useMemo } from "react";
 import Banner from "./(components)/Banner";
 import Link from "next/link";
 import ProductCartImage from "../../../public/bedroom.jpg";
@@ -8,7 +8,78 @@ import Image from "next/image";
 import Close from "./(components)/CloseIcon";
 import QuantityController from "@/components/QuantityController";
 import { Input } from "@/components/ui/input";
+import { useCartStore } from "@/stores/cart.store";
+import { CartItem } from "@/@types/cart.type";
+import { useAppContext } from "@/context/app.context";
+import { cloneDeep } from "lodash";
+import { getLocalProductCart, setLocalProductToCart } from "@/utils/auth";
+import { convertAddProduct } from "@/utils/helper";
 export default function MyCart() {
+  const { cart, updateCart } = useCartStore();
+  const { user } = useAppContext();
+
+  const { totalPrice, totalQuantity: cartLength } = useMemo(() => {
+    const totalQuantity = cart?.reduce(
+      (sum, currentValue) => (sum += currentValue.amount),
+      0
+    );
+
+    const totalPrice = cart?.reduce(
+      (sum, currentValue) => (sum += currentValue.amount * currentValue.price),
+      0
+    );
+
+    return { totalPrice, totalQuantity };
+  }, [cart]);
+
+  const onType = (id: string, value: number) => {
+    const increasingItem = cart.find((item) => item.product == id);
+    let cloneItem = cloneDeep(increasingItem);
+    const cartLS = getLocalProductCart();
+    const parseCart = cartLS ? JSON.parse(cartLS) : {};
+    const cartConverted = convertAddProduct(
+      cart,
+      {
+        ...cloneItem,
+        amount: value,
+      } as CartItem,
+      true
+    );
+    updateCart(cartConverted);
+    if (user?._id) {
+      setLocalProductToCart({ ...parseCart, [user._id]: cartConverted });
+    }
+  };
+
+  const onDecrease = (id: string, value: number) => {
+    const increasingItem = cart.find((item) => item.product == id);
+    let cloneItem = cloneDeep(increasingItem);
+    const cartLS = getLocalProductCart();
+    const parseCart = cartLS ? JSON.parse(cartLS) : {};
+    const cartConverted = convertAddProduct(cart, {
+      ...cloneItem,
+      amount: -1,
+    } as CartItem).filter((item) => item.amount > 0);
+    updateCart(cartConverted);
+    if (user?._id) {
+      setLocalProductToCart({ ...parseCart, [user._id]: cartConverted });
+    }
+  };
+
+  const onIncrease = (id: string, value: number) => {
+    const increasingItem = cart.find((item) => item.product == id);
+    let cloneItem = cloneDeep(increasingItem);
+    const cartLS = getLocalProductCart();
+    const parseCart = cartLS ? JSON.parse(cartLS) : {};
+    const cartConverted = convertAddProduct(cart, {
+      ...cloneItem,
+      amount: 1,
+    } as CartItem);
+    updateCart(cartConverted);
+    if (user?._id) {
+      setLocalProductToCart({ ...parseCart, [user._id]: cartConverted });
+    }
+  };
   return (
     <div>
       <section>
@@ -23,23 +94,22 @@ export default function MyCart() {
       <section>
         <div className="container">
           <div className="text-base font-medium my-4">
-            Total (2 items): <span>8,218,000 đ</span>
+            Total ({cartLength || 0} items): <span>{totalPrice || 0} $</span>
           </div>
           <div className="grid grid-cols-1 medium:grid-cols-10 gap-10">
             <div className="col-span-1 medium:col-span-6 sm:max-h-auto p-3 max-h-[600px] overflow-y-auto">
-              {Array(5)
-                .fill(0)
-                .map((item, index) => (
+              {cart.length > 0 &&
+                cart.map((item, index) => (
                   <div
                     className="flex flex-wrap items-start gap-4 sm:gap-7 py-5 border-b border-darkGrey"
-                    key={index}
+                    key={item.product}
                   >
                     <Link
                       href="/products/1"
                       className="w-full h-[204px] sm:h-[204px] sm:w-[204px] flex-shrink-0"
                     >
                       <Image
-                        src={ProductCartImage}
+                        src={item.image}
                         alt="cart-item"
                         width={0}
                         height={0}
@@ -49,23 +119,31 @@ export default function MyCart() {
                     <div className="w-full sm:flex-1">
                       <div className="flex justify-between items-center">
                         <h3 className="text-xl sm:text-2xl text-black font-semibold">
-                          Air Jordan 1 Zoom Cmft
+                          {item.name}
                         </h3>
                         <Close className="cursor-pointer"></Close>
                       </div>
                       <p className="text-xl  text-red-600 font-semibold my-2">
-                        4,109,000₫
+                        {item.price}$
                       </p>
-                      <div className="text-base font-semibold">
-                        Category: <span className="font-semibold">Black</span>
-                      </div>
+
                       <QuantityController
-                        value={1}
-                        classNameWrapper="my-2"
+                        value={item.amount}
+                        classNameWrapper="my-2 flex items-end"
+                        defaultValue={item.amount}
+                        id={item.product}
+                        onDecrease={onDecrease}
+                        onIncrease={onIncrease}
+                        onType={onType}
                       ></QuantityController>
                     </div>
                   </div>
                 ))}
+              {!cart.length && (
+                <div className="font-semibold text-center">
+                  Your Cart is Empty
+                </div>
+              )}
             </div>
             <div className="col-span-1 medium:col-span-4">
               <h2 className="font-medium text-lg">YOUR CART</h2>
@@ -79,20 +157,22 @@ export default function MyCart() {
                   +
                 </div>
               </div>
-              <div className="flex justify-between items-center">
+              {/* <div className="flex justify-between items-center">
                 <h3 className="text-base font-semibold">
                   Total Product Value:
                 </h3>
-                <span className="text-base font-semibold">8,218,000₫</span>
+                <span className="text-base font-semibold">
+                  {totalPrice || 0}$
+                </span>
               </div>
               <div className="flex justify-between items-center pb-5 border-b border-darkGrey">
                 <h3 className="text-base font-semibold">Total Delivery Fee:</h3>
                 <span className="text-base font-semibold">8,218,000₫</span>
-              </div>
+              </div> */}
               <div className="flex justify-between items-center my-2">
                 <h3 className="text-xl font-bold">Total:</h3>
                 <span className="text-xl font-bold text-red-600">
-                  8,218,000₫
+                  {totalPrice || 0}$
                 </span>
               </div>
               <Button className="w-full py-6">Checkout</Button>

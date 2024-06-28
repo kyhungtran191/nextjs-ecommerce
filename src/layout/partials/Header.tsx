@@ -12,7 +12,11 @@ import Logo from "../../../public/logo.svg";
 import { Separator } from "@/components/ui/separator";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { logout } from "@/services/auth.services";
-import { clearLS, getLocalProductCart } from "@/utils/auth";
+import {
+  clearLS,
+  getLocalProductCart,
+  setLocalProductToCart,
+} from "@/utils/auth";
 import { useRouter } from "next/router";
 import { useAppContext } from "@/context/app.context";
 import { Moon, ShoppingCart, Sun } from "lucide-react";
@@ -41,6 +45,9 @@ import { useCartStore } from "@/stores/cart.store";
 import { getAllProductTypes } from "@/services/product-type.services";
 import QuantityController from "@/components/QuantityController";
 import Close from "@/pages/my-cart/(components)/CloseIcon";
+import { cloneDeep } from "lodash";
+import { convertAddProduct } from "@/utils/helper";
+import { CartItem } from "@/@types/cart.type";
 
 export default function Header() {
   const { cart, clearCart } = useCartStore();
@@ -48,6 +55,7 @@ export default function Header() {
   const { setIsAuth, setUser, user, isAuth } = useAppContext();
 
   const { updateCart } = useCartStore();
+  const router = useRouter();
   useEffect(() => {
     const cartLS = getLocalProductCart();
     const parseData = cartLS ? JSON.parse(cartLS) : {};
@@ -87,6 +95,56 @@ export default function Header() {
     );
     return totalQuantity;
   }, [cart]);
+
+  const onType = (id: string, value: number) => {
+    const increasingItem = cart.find((item) => item.product == id);
+    let cloneItem = cloneDeep(increasingItem);
+    const cartLS = getLocalProductCart();
+    const parseCart = cartLS ? JSON.parse(cartLS) : {};
+    const cartConverted = convertAddProduct(
+      cart,
+      {
+        ...cloneItem,
+        amount: value,
+      } as CartItem,
+      true
+    );
+    updateCart(cartConverted);
+    if (user?._id) {
+      setLocalProductToCart({ ...parseCart, [user._id]: cartConverted });
+    }
+  };
+
+  const onDecrease = (id: string, value: number) => {
+    const increasingItem = cart.find((item) => item.product == id);
+    let cloneItem = cloneDeep(increasingItem);
+    const cartLS = getLocalProductCart();
+    const parseCart = cartLS ? JSON.parse(cartLS) : {};
+    const cartConverted = convertAddProduct(cart, {
+      ...cloneItem,
+      amount: -1,
+    } as CartItem).filter((item) => item.amount > 0);
+    updateCart(cartConverted);
+    if (user?._id) {
+      setLocalProductToCart({ ...parseCart, [user._id]: cartConverted });
+    }
+  };
+
+  const onIncrease = (id: string, value: number) => {
+    const increasingItem = cart.find((item) => item.product == id);
+    let cloneItem = cloneDeep(increasingItem);
+    const cartLS = getLocalProductCart();
+    const parseCart = cartLS ? JSON.parse(cartLS) : {};
+    const cartConverted = convertAddProduct(cart, {
+      ...cloneItem,
+      amount: 1,
+    } as CartItem);
+    updateCart(cartConverted);
+    if (user?._id) {
+      setLocalProductToCart({ ...parseCart, [user._id]: cartConverted });
+    }
+  };
+
   return (
     <header className="h-[72px] w-full fixed bg-transparent top-0 left-0 right-0 shadow-md z-30 bg-white text-black">
       <nav className="h-full flex justify-between items-center leading-[72px]  container-fluid">
@@ -138,8 +196,8 @@ export default function Header() {
             <SheetTrigger asChild>
               <Button variant="ghost" className="relative">
                 <ShoppingCart></ShoppingCart>
-                <div className="absolute w-5 h-5 bg-red-600 rounded-full top-0 right-1 flex items-center justify-center text-xs text-white">
-                  {cartLength || 0}
+                <div className="absolute w-5 h-5 bg-red-600 rounded-full top-0 right-1 flex items-center justify-center text-[10px] text-white">
+                  {(cartLength && cartLength >= 100 ? "99+" : cartLength) || 0}
                 </div>
               </Button>
             </SheetTrigger>
@@ -150,6 +208,9 @@ export default function Header() {
                   <span className="text-base text-slate-600 font-medium">
                     ({cartLength || 0} items)
                   </span>
+                  <Link href="my-cart" className="text-xs">
+                    View all
+                  </Link>
                 </SheetTitle>
                 <Button>Check out</Button>
               </SheetHeader>
@@ -189,9 +250,14 @@ export default function Header() {
                           {item?.price}$
                         </p>
                         <QuantityController
-                          value={item.amount}
                           defaultValue={item.amount}
+                          value={item.amount}
                           classNameWrapper="my-2"
+                          onDecrease={onDecrease}
+                          onType={onType}
+                          onIncrease={onIncrease}
+                          id={item.product}
+                          max={100}
                         ></QuantityController>
                       </div>
                       {index != cart.length - 1 && <Separator></Separator>}
