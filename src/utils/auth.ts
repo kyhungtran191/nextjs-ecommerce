@@ -83,7 +83,6 @@ export const getLocalProductCart = () => {
   if (typeof window !== "undefined") {
     return window.localStorage.getItem("cart");
   }
-
   return "";
 };
 

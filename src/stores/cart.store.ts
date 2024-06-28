@@ -9,6 +9,8 @@ interface CartState {
 
 export const useCartStore = create<CartState>((set) => ({
   cart: [],
-  updateCart: (ordersItem: CartItem[]) => set(() => ({ cart: ordersItem })),
+  updateCart: (ordersItem: CartItem[]) => {
+    return set(() => ({ cart: ordersItem }));
+  },
   clearCart: () => set(() => ({ cart: [] })),
 }));

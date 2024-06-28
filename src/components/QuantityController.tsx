@@ -2,12 +2,13 @@ import InputNumber, { InputNumberType } from "./InputNumber";
 
 interface IProps extends InputNumberType {
   max?: number;
-  onDecrease?: (value: number) => void;
-  onIncrease?: (value: number) => void;
-  onType?: (value: number) => void;
+  onDecrease?: (id: string, value: number) => void;
+  onIncrease?: (id: string, value: number) => void;
+  onType?: (id: string, value: number) => void;
   onFocusOut?: (value: number) => void;
   value: number;
   classNameWrapper?: string;
+  id: string;
 }
 export default function QuantityController({
   classNameWrapper = "",
@@ -17,21 +18,24 @@ export default function QuantityController({
   onIncrease,
   onType,
   onFocusOut,
+  id,
 }: IProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let _value = Number(e.target.value);
+    console.log("_value", _value);
     if (max && _value >= max) {
       _value = max;
     } else if (_value <= 1) _value = 1;
-    onType && onType(_value);
+    onType && onType(id, _value);
   };
+
   const handleIncrease = () => {
     if (max && value >= max) {
       value = max;
     } else {
       value++;
     }
-    onIncrease && onIncrease(value);
+    onIncrease && onIncrease(id, value);
   };
 
   const handleDecrease = () => {
@@ -40,7 +44,7 @@ export default function QuantityController({
     } else {
       value--;
     }
-    onDecrease && onDecrease(value);
+    onDecrease && onDecrease(id, value);
   };
   const handleFocusOut = (e: React.FocusEvent<HTMLInputElement, Element>) => {
     const _value = Number(e.target.value);

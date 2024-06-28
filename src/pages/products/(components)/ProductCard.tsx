@@ -31,12 +31,9 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
       }
     }
     const cartLS = getLocalProductCart();
-    console.log("Cart Item", item);
     const parseCart = cartLS ? JSON.parse(cartLS) : {};
     const convertedCartItems = convertAddProduct(cart, item);
-    console.log(convertedCartItems);
     updateCart(convertedCartItems);
-    console.log("cartParse", parseCart);
     if (user?._id) {
       setLocalProductToCart({ ...parseCart, [user._id]: convertedCartItems });
     }
