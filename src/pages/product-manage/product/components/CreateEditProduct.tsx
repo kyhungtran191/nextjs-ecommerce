@@ -415,7 +415,7 @@ export default function EditAddProductDialog({
                     </WrapperFileUpload>
                   </div>
                 </div>
-                <div className="col-span-4 xl:col-span-2 gap-x-4 rounded-xl shadow-md p-4 grid grid-cols-2  items-center">
+                <div className="col-span-4 xl:col-span-2 gap-x-4 rounded-xl shadow-md p-4 grid grid-cols-2  items-center relative z-10">
                   <div className="col-span-2 medium:col-span-1">
                     <Label htmlFor="name">Product name*</Label>
                     <Controller
@@ -566,9 +566,10 @@ export default function EditAddProductDialog({
                               )}
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
+                          <PopoverContent className="w-auto p-0 relative">
                             <Calendar
                               mode="single"
+                              className="cursor-pointer"
                               selected={field?.value as Date}
                               disabled={(date) => date < new Date()}
                               onDayClick={field.onChange}
@@ -606,7 +607,12 @@ export default function EditAddProductDialog({
                               )}
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
+                          <PopoverContent
+                            className="w-auto p-0"
+                            onClick={() => {
+                              console.log("click");
+                            }}
+                          >
                             <Calendar
                               mode="single"
                               selected={field?.value as Date}
