@@ -24,7 +24,7 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
   const { user } = useAppContext();
   const router = useRouter();
   const [isLikedByUser, setIsLikedByUser] = useState<Boolean>(
-    product.likedBy.includes(user?._id as string)
+    product?.likedBy?.includes(user?._id as string)
   );
 
   const queryClient = useQueryClient();
