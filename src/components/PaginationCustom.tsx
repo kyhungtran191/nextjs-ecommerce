@@ -23,7 +23,7 @@ export default function PaginationCustom({
   className?: string;
 }) {
   const [isClient, setIsClient] = useState(false);
-  const [page, setPage] = useState(Number(queryConfig.page) || 0);
+  const [page, setPage] = useState(Number(queryConfig.page) || 1);
   let dotAfter = false;
   let dotBefore = false;
 

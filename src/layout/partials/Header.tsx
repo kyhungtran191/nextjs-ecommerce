@@ -17,7 +17,7 @@ import {
   getLocalProductCart,
   setLocalProductToCart,
 } from "@/utils/auth";
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import { useAppContext } from "@/context/app.context";
 import { Moon, ShoppingCart, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -55,7 +55,6 @@ export default function Header() {
   const { setIsAuth, setUser, user, isAuth } = useAppContext();
 
   const { updateCart } = useCartStore();
-  const router = useRouter();
   useEffect(() => {
     const cartLS = getLocalProductCart();
     const parseData = cartLS ? JSON.parse(cartLS) : {};
@@ -72,7 +71,7 @@ export default function Header() {
       setIsAuth(false);
       setUser(undefined);
       toast.success("Logout successfully!");
-      // router.push("/login");
+      Router.push("/login");
     },
   });
   const handleLogout = () => {

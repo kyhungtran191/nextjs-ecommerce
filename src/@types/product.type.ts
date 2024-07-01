@@ -26,7 +26,7 @@ export type TProductPublic = {
   discountStartDate: null;
   discountEndDate: null;
   type: string;
-  likedBy: never[];
+  likedBy: string[];
   totalLikes?: number;
   status: number;
   views: number;

@@ -53,7 +53,6 @@ export default function Products(props: TProps) {
   const [range, setRange] = useState([0, 1000]);
 
   const [categoriesSelected, setCategoriesSelected] = useState<string[]>([]);
-  const [isFirstRender, setIsFirstRender] = useState(false);
 
   const router = useRouter();
 
@@ -69,9 +68,7 @@ export default function Products(props: TProps) {
   const typeProduct = useQuery({
     queryKey: ["product_types"],
     queryFn: () => getAllProductTypes(queryConfig),
-    onSuccess: () => {
-      setIsFirstRender(true);
-    },
+
     staleTime: 60 * 10,
     cacheTime: 60 * 10 * 10,
   });
@@ -137,7 +134,6 @@ export default function Products(props: TProps) {
       { scroll: false }
     );
   };
-
   return (
     <div>
       <div className="container-fluid">
@@ -327,6 +323,7 @@ export default function Products(props: TProps) {
                     <SkeletonCard key={index}></SkeletonCard>
                   ))}
               {!isLoading &&
+                products.length &&
                 products.map((item, index) => (
                   <ProductCard product={item} key={item._id}></ProductCard>
                 ))}
@@ -364,6 +361,7 @@ export const getServerSideProps = async (context: any) => {
   const data = await getProductPublic(pickBy(queryData, identity));
   // Pass data to the page via props
   // Test render list
+  console.log("rerender");
   return { props: data.data.data };
 };
 Products.authGuard = false;

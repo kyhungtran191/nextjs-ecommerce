@@ -1,7 +1,7 @@
 import { Heart, Router, ShoppingCart, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { TProductPublic } from "@/@types/product.type";
 import {
   Tooltip,
@@ -15,10 +15,54 @@ import { convertAddProduct } from "@/utils/helper";
 import { useAppContext } from "@/context/app.context";
 import { getLocalProductCart, setLocalProductToCart } from "@/utils/auth";
 import { useRouter } from "next/router";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { likeProduct, unlikeProduct } from "@/services/product-public.services";
+import { toast } from "react-toastify";
+import useProduct from "@/query/useProduct";
 export default function ProductCard({ product }: { product: TProductPublic }) {
   const { cart, updateCart } = useCartStore();
   const { user } = useAppContext();
   const router = useRouter();
+  const [isLikedByUser, setIsLikedByUser] = useState<Boolean>(
+    product.likedBy.includes(user?._id as string)
+  );
+
+  const queryClient = useQueryClient();
+
+  const { mutate: like } = useMutation({
+    mutationFn: (productId: string) => likeProduct({ productId }),
+    onSuccess: () => {
+      // Success actions
+      toast.success("Like product successfully!");
+      setIsLikedByUser(true);
+      queryClient.invalidateQueries(["favorite-me"]);
+    },
+    onError: (error) => {
+      // Error actions
+    },
+  });
+
+  const { mutate: unlike } = useMutation({
+    mutationFn: (productId: string) => unlikeProduct({ productId }),
+    onSuccess: () => {
+      // Success actions
+      toast.success("unLike product successfully!");
+      setIsLikedByUser(false);
+      queryClient.invalidateQueries(["favorite-me"]);
+    },
+    onError: (error) => {
+      // Error actions
+    },
+  });
+
+  const handleToggleLikeProduct = () => {
+    if (!isLikedByUser) {
+      like(product._id);
+    } else {
+      unlike(product._id);
+    }
+  };
+
   const addProductToCart = (item: CartItem) => {
     if (!user?._id) {
       if (router.asPath !== "/" && router.asPath !== "/login") {
@@ -51,8 +95,13 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
         ></Image>
       </Link>
 
-      <div className="absolute w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center top-4 left-4">
-        <Heart></Heart>
+      <div
+        className="absolute w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center top-4 left-4 cursor-pointer"
+        onClick={handleToggleLikeProduct}
+      >
+        <Heart
+          className={`${isLikedByUser ? "fill-red-500 text-red-500" : ""}`}
+        ></Heart>
       </div>
       <div
         className="absolute w-10 h-10  rounded-full  bg-white shadow-lg flex items-center justify-center top-4 right-4"
