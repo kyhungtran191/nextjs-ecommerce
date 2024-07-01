@@ -27,6 +27,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AxiosInterceptor } from "@/configs/axiosInstance";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
+import useDetectIsLoadingSSR from "@/hooks/useDetectIsLoadingSSR";
 // ** Contexts
 
 // ** Global css styles
@@ -94,6 +95,8 @@ export default function App(props: ExtendedAppProps) {
     },
   });
 
+  const { isLoading } = useDetectIsLoadingSSR();
+
   return (
     <main className={poppins.className}>
       <Head>
@@ -112,12 +115,12 @@ export default function App(props: ExtendedAppProps) {
                 authGuard={authGuard}
               >
                 {getLayout(<Component {...pageProps} />)}
-                <ProgressBar
-                  height="2px"
-                  color="#c3b1ff"
-                  options={{ showSpinner: true }}
-                  shallowRouting
-                />
+                <ProgressBar height="2px" color="#c3b1ff" shallowRouting />
+                {isLoading && (
+                  <div className="fixed inset-0 bg-white/35 flex items-center justify-center">
+                    <ComponentsLoading></ComponentsLoading>
+                  </div>
+                )}
               </AclGuard>
             </Guard>
           </AxiosInterceptor>

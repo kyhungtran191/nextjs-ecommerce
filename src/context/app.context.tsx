@@ -50,6 +50,7 @@ export const AppContextProvider = ({
     onSuccess: (data) => {
       const userData = data && data?.data?.data;
       setUser(userData as User);
+      console.log("User rerender");
       setIsAuth(true);
     },
     onError: (err: any) => {
