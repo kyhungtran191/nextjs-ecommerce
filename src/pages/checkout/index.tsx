@@ -63,8 +63,8 @@ export default function Checkout() {
         </div>
       )}
       {!isDeliveryLoading && !isPaymentLoading && (
-        <div className="grid grid-cols-3 gap-16">
-          <div className="p-4 rounded-lg bg-slate-100/50 min-h-[300px] shadow-sm col-span-1">
+        <div className="grid grid-cols-1 medium:grid-cols-3 medium:gap-16">
+          <div className="p-4 rounded-lg bg-slate-100/50 min-h-[300px] shadow-sm col-span-1 w-full">
             <div className="my-2">
               <div className="flex items-center gap-x-2">
                 <h3 className="font-semibold">Shipping Address</h3>

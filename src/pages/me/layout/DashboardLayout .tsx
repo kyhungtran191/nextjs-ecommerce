@@ -2,51 +2,50 @@ import Link from "next/link";
 import React, { ReactNode } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter } from "next/router";
+import Image from "next/image";
+import { Separator } from "@/components/ui/separator";
+import { SidebarNav } from "./SidebarNav";
+
+const sidebarNavItems = [
+  {
+    title: "Profile",
+    href: "/me",
+  },
+  {
+    title: "Orders",
+    href: "/me/orders",
+  },
+  {
+    title: "Favorites",
+    href: "/me/favorite",
+  },
+  {
+    title: "Change Password",
+    href: "/me/password",
+  },
+];
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   return (
-    <div className="container-fluid bg-white rounded-lg">
-      <div className="my-5 text-center font-semibold text-2xl">
-        Account Management
+    <>
+      <div className="hidden space-y-6 p-10 pb-16 md:block">
+        <div className="space-y-0.5">
+          <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
+          <p className="text-muted-foreground">
+            Manage your account settings and set e-mail preferences.
+          </p>
+        </div>
+        <Separator className="my-6" />
+        <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0 min-h-[50vh]">
+          <aside className="-mx-4 lg:w-1/5 h-full">
+            <SidebarNav items={sidebarNavItems} />
+          </aside>
+          <Separator orientation="vertical"></Separator>
+          <div className="flex-1 ">{children}</div>
+        </div>
       </div>
-      <div className="flex gap-8 mt-5  min-h-[70vh]">
-        <aside className="flex-[1] flex flex-col items-center justify-start py-10  rounded-lg shadow-lg  font-semibold gap-6">
-          {/* Include shared UI here e.g. a sidebar */}
-          <Link
-            href="/me"
-            className={`hover:font-bold px-3 py-2 rounded-lg w-full text-center ${
-              router.asPath == "/me"
-                ? "bg-purple text-white"
-                : "bg-white text-[#969595] "
-            }`}
-          >
-            Profile
-          </Link>
-          <Link
-            href="/me/orders"
-            className={`hover:font-bold px-3 py-2 rounded-lg w-full text-center ${
-              router.asPath.startsWith("/me/orders")
-                ? "bg-purple text-white"
-                : "bg-white text-[#969595] "
-            }`}
-          >
-            Orders
-          </Link>
-          <Link
-            href="/me/favorite"
-            className={`hover:font-bold px-3 py-2 rounded-lg w-full text-center ${
-              router.asPath.startsWith("/me/favorite")
-                ? "bg-purple text-white"
-                : "bg-white text-[#969595] "
-            }`}
-          >
-            Favorite
-          </Link>
-        </aside>
-        <div className=" flex-[8] p-6 rounded shadow-lg">{children}</div>
-      </div>
-    </div>
+    </>
   );
 };
 export default DashboardLayout;
