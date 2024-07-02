@@ -26,12 +26,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
+import moment from "moment";
 import { convertBase64, stringToSlug } from "@/utils/helper";
 import { toast } from "react-toastify";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
 import { Switch } from "@/components/ui/switch";
-import { EditorState } from "draft-js";
 import {
   createProduct,
   getDetailProductAdmin,
@@ -39,14 +38,6 @@ import {
 } from "@/services/product.services";
 import WrapperFileUpload from "@/components/wrapper-react-drop";
 import Image from "next/image";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
 
 // CKeditor
 import { TProductAdd } from "@/@types/product.type";
@@ -242,23 +233,25 @@ export default function EditAddProductDialog({
     enabled: Boolean(idProduct),
     onSuccess: (data) => {
       const product = data?.data?.data;
-      setImageProduct(product?.image as string);
-      reset({
-        name: product?.name,
-        countInStock: String(product?.countInStock),
-        discount: product?.discount,
-        description: product?.description,
-        price: String(product?.price),
-        discountEndDate: product?.discountEndDate,
-        discountStartDate: product?.discountStartDate,
-        slug: product?.slug,
-        type: product?.type,
-        status: product?.status,
-      });
-      setStatus(product?.status as number);
+      if (product) {
+        setImageProduct(product?.image as string);
+        reset({
+          name: product?.name,
+          countInStock: String(product?.countInStock),
+          discount: product?.discount,
+          description: product?.description,
+          price: String(product?.price),
+          discountEndDate: product?.discountEndDate,
+          discountStartDate: product?.discountStartDate,
+          slug: product?.slug,
+          type: product?.type,
+          status: product?.status,
+        });
+        setValue("type", product.type);
+        setStatus(product?.status as number);
+      }
     },
   });
-
   const createProductMutation = useMutation({
     mutationFn: (body: TProductAdd) => createProduct(body),
   });
@@ -267,6 +260,8 @@ export default function EditAddProductDialog({
     mutationFn: (body: TProductAdd) =>
       updateProductAdmin(body, idProduct as string),
   });
+
+  console.log("type", getValues("type"));
 
   const onSubmit = (data: any) => {
     if (!Object.keys(errors).length) {
@@ -504,11 +499,11 @@ export default function EditAddProductDialog({
                       }}
                       defaultValue={getValues("type")}
                     >
-                      <SelectTrigger className="py-6">
+                      <SelectTrigger className="py-6" value={getValues("type")}>
                         <SelectValue placeholder="Select Product Type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectGroup>
+                        <SelectGroup defaultValue={getValues("type")}>
                           {productTypes?.map((item) => (
                             <SelectItem value={item._id} key={item._id}>
                               {item.name}
@@ -549,34 +544,41 @@ export default function EditAddProductDialog({
                       control={control}
                       name="discountStartDate"
                       render={({ field }) => (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0 relative">
-                            <Calendar
-                              mode="single"
-                              className="cursor-pointer"
-                              selected={field?.value as Date}
-                              disabled={(date) => date < new Date()}
-                              onDayClick={field.onChange}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        // <Popover>
+                        //   <PopoverTrigger asChild>
+                        //     <Button
+                        //       variant={"outline"}
+                        //       className={cn(
+                        //         "w-full justify-start text-left font-normal",
+                        //         !field.value && "text-muted-foreground"
+                        //       )}
+                        //     >
+                        //       <CalendarIcon className="mr-2 h-4 w-4" />
+                        //       {field.value ? (
+                        //         format(field.value, "PPP")
+                        //       ) : (
+                        //         <span>Pick a date</span>
+                        //       )}
+                        //     </Button>
+                        //   </PopoverTrigger>
+                        //   <PopoverContent className="w-auto p-0 relative">
+                        //     <Calendar
+                        //       mode="single"
+                        //       className="cursor-pointer"
+                        //       selected={field?.value as Date}
+                        //       disabled={(date) => date < new Date()}
+                        //       onDayClick={field.onChange}
+                        //       initialFocus
+                        //     />
+                        //   </PopoverContent>
+                        // </Popover>
+                        <input
+                          type="date"
+                          // onChange={field.onChange}
+                          className="cursor-pointer border p-2 m-2 rounded-lg shadow-sm relative"
+                          {...field}
+                          value={moment(field.value).format("YYYY-MM-DD")}
+                        ></input>
                       )}
                     />
                     <div className=" text-red-500 text-sm font-medium">
@@ -590,38 +592,45 @@ export default function EditAddProductDialog({
                       control={control}
                       name="discountEndDate"
                       render={({ field }) => (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !field.value && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-auto p-0"
-                            onClick={() => {
-                              console.log("click");
-                            }}
-                          >
-                            <Calendar
-                              mode="single"
-                              selected={field?.value as Date}
-                              disabled={(date) => date < new Date()}
-                              onDayClick={field.onChange}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        // <Popover>
+                        //   <PopoverTrigger asChild>
+                        //     <Button
+                        //       variant={"outline"}
+                        //       className={cn(
+                        //         "w-full justify-start text-left font-normal",
+                        //         !field.value && "text-muted-foreground"
+                        //       )}
+                        //     >
+                        //       <CalendarIcon className="mr-2 h-4 w-4" />
+                        //       {field.value ? (
+                        //         format(field.value, "PPP")
+                        //       ) : (
+                        //         <span>Pick a date</span>
+                        //       )}
+                        //     </Button>
+                        //   </PopoverTrigger>
+                        //   <PopoverContent
+                        //     className="w-auto p-0 relative z-[60]"
+                        //     onClick={() => {
+                        //       console.log("click");
+                        //     }}
+                        //   >
+                        //     <Calendar
+                        //       mode="single"
+                        //       className="z-[60]"
+                        //       selected={field?.value as Date}
+                        //       disabled={(date) => date < new Date()}
+                        //       onDayClick={field.onChange}
+                        //       initialFocus
+                        //     />
+                        //   </PopoverContent>
+                        // </Popover>
+                        <input
+                          type="date"
+                          className="cursor-pointer border p-2 m-2 rounded-lg shadow-sm relative"
+                          {...field}
+                          value={moment(field.value).format("YYYY-MM-DD")}
+                        ></input>
                       )}
                     />
                     <div className=" text-red-500 text-sm font-medium">
