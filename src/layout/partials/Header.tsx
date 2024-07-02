@@ -19,7 +19,16 @@ import {
 } from "@/utils/auth";
 import Router, { useRouter } from "next/router";
 import { useAppContext } from "@/context/app.context";
-import { Moon, ShoppingCart, Sun } from "lucide-react";
+import {
+  Armchair,
+  KeyRound,
+  LogOut,
+  Moon,
+  ShoppingBasket,
+  ShoppingCart,
+  Sun,
+  User,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -113,6 +122,24 @@ export default function Header() {
       setLocalProductToCart({ ...parseCart, [user._id]: cartConverted });
     }
   };
+
+  const popoverOptions = [
+    {
+      title: "My Orders",
+      link: "/me/orders",
+      icon: ShoppingBasket,
+    },
+    {
+      title: "My Product",
+      link: "/me/favorite",
+      icon: Armchair,
+    },
+    {
+      title: "Change Password",
+      link: "/me/favorite",
+      icon: KeyRound,
+    },
+  ];
 
   const onDecrease = (id: string, value: number) => {
     const increasingItem = cart.find((item) => item.product == id);
@@ -278,23 +305,35 @@ export default function Header() {
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                 </PopoverTrigger>
-                <PopoverContent className="px-2 w-50">
-                  <div className="grid gap-4">
-                    <div className="space-y-2 hover:bg-slate-100">
-                      <h4 className="font-medium leading-none">
+                <PopoverContent className="w-50">
+                  <div className="grid">
+                    <div className="">
+                      <Link
+                        href="/me"
+                        className="font-medium leading-none py-2 px-2 cursor-pointer rounded-lg hover:bg-slate-100"
+                      >
                         {user?.email}
-                      </h4>
-                      <Separator></Separator>
+                      </Link>
+                      <Separator className="my-2"></Separator>
                     </div>
                     <div className="gap-2 text-slate-700 font-medium">
-                      <div className="flex items-center w-full px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 gap-x-3">
-                        My Profile
-                      </div>
+                      {popoverOptions.map((item, index) => {
+                        return (
+                          <Link
+                            className="flex items-end w-full px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 gap-x-2"
+                            key={index}
+                            href={item.link}
+                          >
+                            <item.icon></item.icon> {item.title}
+                          </Link>
+                        );
+                      })}
+
                       <div
                         className="flex items-center w-full px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 gap-x-3"
                         onClick={handleLogout}
                       >
-                        Logout
+                        <LogOut></LogOut> Logout
                       </div>
                     </div>
                   </div>

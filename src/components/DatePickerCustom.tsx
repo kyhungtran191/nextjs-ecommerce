@@ -37,7 +37,7 @@ export default function DatePickerCustom({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
+      className={cn("p-3 fixed", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -77,6 +77,7 @@ export default function DatePickerCustom({
             (child: any) => child.props.value === value
           );
           const handleChange = (value: any) => {
+            console.log(value);
             const changeEvent = {
               target: { value },
             };
@@ -89,7 +90,7 @@ export default function DatePickerCustom({
                 handleChange(value);
               }}
             >
-              <SelectTrigger className="pr-1.5 focus:ring-0">
+              <SelectTrigger className="pr-1.5 focus:ring-0 z-50">
                 <SelectValue>{selected?.props?.children}</SelectValue>
               </SelectTrigger>
               <SelectContent position="popper">

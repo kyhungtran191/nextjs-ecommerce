@@ -18,7 +18,6 @@ import { useRouter } from "next/router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { likeProduct, unlikeProduct } from "@/services/product-public.services";
 import { toast } from "react-toastify";
-import useProduct from "@/query/useProduct";
 export default function ProductCard({ product }: { product: TProductPublic }) {
   const { cart, updateCart } = useCartStore();
   const { user } = useAppContext();

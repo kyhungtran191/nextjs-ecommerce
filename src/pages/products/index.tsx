@@ -65,10 +65,10 @@ export default function Products(props: TProps) {
     let categoryList = (queryConfig.category as string)?.split("|");
     setCategoriesSelected(categoryList || []);
   }, [queryConfig.category]);
+
   const typeProduct = useQuery({
     queryKey: ["product_types"],
     queryFn: () => getAllProductTypes(queryConfig),
-
     staleTime: 60 * 10,
     cacheTime: 60 * 10 * 10,
   });
