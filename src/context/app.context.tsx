@@ -53,6 +53,7 @@ export const AppContextProvider = ({
     queryFn: () => profile(),
     enabled: Boolean(getAccessTokenFromLS()),
     onSuccess: (data) => {
+      console.log("user rerender")
       const userData = data && data?.data?.data;
       setUser(userData as User);
       saveUserToLS(userData as User);

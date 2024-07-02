@@ -14,16 +14,71 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { useQueryCities } from "@/query/useQueryCity";
+import { useAppContext } from "@/context/app.context";
+import * as yup from "yup";
+import { toast } from "react-toastify";
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useMutation } from "@tanstack/react-query";
+import { updateMe } from "@/services/auth.services";
+import { User } from "@/@types/auth.type";
+
+type TDefaultValue = {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  city: string;
+  address: string;
+};
+
 export default function Me() {
-  const [imageProduct, setImageProduct] = useState<string>("");
+  const { user } = useAppContext();
+
+  const [avatar, setAvatar] = useState<string>("");
+
+  const schema = yup.object().shape({
+    firstName: yup.string().required("Required_field"),
+    middleName: yup.string().required("Required_field"),
+    lastName: yup.string().required("Required_field"),
+    email: yup.string().required("Required_field"),
+    phoneNumber: yup
+      .string()
+      .required("Required_field")
+      .min(9, "The phone number is min 9 number"),
+    city: yup.string(),
+    address: yup.string(),
+  });
+
+  const defaultValues: TDefaultValue = {
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    city: user?.city || "",
+    address: "",
+  };
+
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues,
+    mode: "onBlur",
+    resolver: yupResolver(schema),
+  });
+
   const handleUploadImage = async (file: File) => {
     const base64 = await convertBase64(file);
-    setImageProduct(base64 as string);
+    setAvatar(base64 as string);
   };
 
   const { data } = useQueryCities();
@@ -31,6 +86,43 @@ export default function Me() {
   const cityOptions = useMemo(() => {
     return data?.data?.data?.cities;
   }, [data?.data?.data?.cities]);
+
+  useEffect(() => {
+    if (user?._id) {
+      reset({
+        address: user?.address,
+        city: user?.city,
+        email: user?.email,
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        middleName: user.middleName,
+        phoneNumber: user.phoneNumber,
+      });
+
+      if (user.avatar) {
+        setAvatar(user?.avatar);
+      }
+    }
+  }, [user]);
+
+  const updateMeMutation = useMutation({
+    mutationFn: (body: any) => updateMe(body),
+  });
+
+  const onSubmit = (value: any) => {
+    const data = {
+      ...value,
+      avatar,
+    };
+    updateMeMutation.mutate(data, {
+      onSuccess: (data) => {
+        toast.success("update success");
+      },
+      onError: (err: any) => {
+        console.log(err);
+      },
+    });
+  };
 
   return (
     <>
@@ -42,10 +134,10 @@ export default function Me() {
         }}
         className="w-[100px] h-[100px] mx-auto rounded-full border cursor-pointer flex items-center justify-center mb-2"
       >
-        {imageProduct ? (
+        {avatar ? (
           <div className="w-full h-full relative group">
             <Image
-              src={imageProduct}
+              src={avatar}
               width={0}
               height={0}
               alt={"product"}
@@ -56,7 +148,7 @@ export default function Me() {
                 variant={"outline"}
                 onClick={(e) => {
                   e.stopPropagation();
-                  setImageProduct("");
+                  setAvatar("");
                 }}
               >
                 <Trash2 className="text-red-400"></Trash2>
@@ -67,84 +159,136 @@ export default function Me() {
           <ImagePlus />
         )}
       </WrapperFileUpload>
-      <form className="grid items-center  grid-cols-1 max-w-5xl mx-auto ">
+      <form
+        className="grid items-center  grid-cols-1 max-w-5xl mx-auto"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <div className="">
           <Label className="font-semibold text-md">First Name</Label>
-          <Input
-            className="p-4 mt-1 font-semibold outline-none "
-            placeholder="Enter First Name"
-            type={"text"}
-          ></Input>
+          <Controller
+            control={control}
+            name="firstName"
+            render={({ field }) => (
+              <Input
+                className="px-4 py-6 outline-none text-sm"
+                placeholder="First Name"
+                {...field}
+              ></Input>
+            )}
+          />
           <div className="h-5 mt-2 text-base font-semibold text-red-500"></div>
         </div>
 
         <div className="">
           <Label className="font-semibold text-md">Middle Name</Label>
-          <Input
-            className="p-4 mt-1 font-semibold  outline-none "
-            placeholder="Enter Last Name"
-            type={"text"}
-          ></Input>
+          <Controller
+            control={control}
+            name="middleName"
+            render={({ field }) => (
+              <Input
+                className="px-4 py-6 outline-none text-sm"
+                placeholder="Middle Name"
+                {...field}
+              ></Input>
+            )}
+          />
           <div className="h-5  text-base font-semibold text-red-500"></div>
         </div>
 
         <div className="">
           <Label className="font-semibold text-md">Last Name</Label>
-          <Input
-            className="p-4 mt-1 font-semibold  outline-none "
-            placeholder="Enter Last Name"
-            type={"text"}
-          ></Input>
+          <Controller
+            control={control}
+            name="lastName"
+            render={({ field }) => (
+              <Input
+                className="px-4 py-6 outline-none text-sm"
+                placeholder="Last Name"
+                {...field}
+              ></Input>
+            )}
+          />
           <div className="h-5  text-base font-semibold text-red-500"></div>
         </div>
         <div className="">
           <Label className="font-semibold text-md">Email</Label>
-          <Input
-            className="p-4 mt-1 font-semibold bg-gray-200/80 outline-none"
-            placeholder="Enter Email"
-            disabled
-            type={"text"}
-          ></Input>
+          <Controller
+            control={control}
+            name="email"
+            render={({ field }) => (
+              <Input
+                className="p-4 mt-1 font-semibold bg-gray-200/80 outline-none"
+                placeholder="Enter Email"
+                disabled
+                type={"text"}
+                {...field}
+              ></Input>
+            )}
+          />
+
           <div className="h-5  text-base font-semibold text-red-500"></div>
         </div>
 
         <div className="">
           <Label className="font-semibold text-md">Phone</Label>
-          <Input
-            className="p-4 mt-1 font-semibold  outline-none "
-            placeholder="+84"
-            type={"text"}
-          ></Input>
-
+          <Controller
+            control={control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <Input
+                className="px-4 py-6 outline-none text-sm"
+                placeholder="Phone"
+                {...field}
+              ></Input>
+            )}
+          />
           <div className="h-5 text-base font-semibold text-red-500"></div>
         </div>
 
         <div className="">
           <Label className="font-semibold text-md">Address</Label>
-          <Input
-            className="p-4 mt-1 font-semibold"
-            placeholder="Address"
-            type={"text"}
-          ></Input>
+          <Controller
+            control={control}
+            name="address"
+            render={({ field }) => (
+              <Input
+                className="px-4 py-6 outline-none text-sm"
+                placeholder="Address"
+                {...field}
+              ></Input>
+            )}
+          />
         </div>
         <div className="my-3">
           <Label className="font-semibold text-md">City</Label>
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select City" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {cityOptions?.map((city) => {
-                  return (
-                    <SelectItem value={city._id} key={city._id}>
-                      {city.name}
-                    </SelectItem>
-                  );
-                })}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+
+          <Controller
+            control={control}
+            name="city"
+            render={({ field }) => (
+              <Select
+                {...field}
+                value={field.value}
+                defaultValue={field.value}
+                onValueChange={field.onChange}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select City" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {cityOptions?.map((city) => {
+                      return (
+                        <SelectItem value={city._id} key={city._id}>
+                          {city.name}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            )}
+          ></Controller>
         </div>
 
         <Button className=" py-3 bg-blend-darken max-w-[80vw] mt-5  ">

@@ -24,4 +24,8 @@ export const profile = async () => {
   return await instanceAxios.get<ResponseData<User>>(AuthAPI.me);
 };
 
+export const updateMe = async (body: any) => {
+  return await instanceAxios.put<ResponseData<User>>(AuthAPI.me, body);
+};
+
 export const logout = async () => await instanceAxios.post<{}>(AuthAPI.logout);
