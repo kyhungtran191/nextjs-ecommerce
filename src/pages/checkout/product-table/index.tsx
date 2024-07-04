@@ -14,9 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { isExpiry } from "@/utils/helper";
 export default function ProductTable() {
   const { cart } = useCartStore();
-  console.log(cart);
+
   const columns = [
     {
       accessorKey: "product",
@@ -101,7 +102,6 @@ export default function ProductTable() {
         return <div className="text-center">Total</div>;
       },
       cell: ({ row }: { row: any }) => {
-        console.log(row.original.amount);
         return (
           <div
             className={`font-semibold max-w-[80px] p-2 rounded-lg text-center`}
