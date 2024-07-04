@@ -153,7 +153,7 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
                 <p className="text-base">{disCountPrice}$</p>
               </>
             ) : (
-              <p className="text-base">{product.price}$</p>
+              <p className="text-base">{product?.price}$</p>
             )}
             {/* Fix later */}
           </div>
