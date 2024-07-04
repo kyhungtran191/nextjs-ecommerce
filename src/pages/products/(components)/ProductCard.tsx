@@ -64,12 +64,12 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
 
   const { isExpired, disCountPrice } = useMemo(() => {
     const isExpired = isExpiry(
-      product.discountStartDate,
-      product.discountEndDate
+      product?.discountStartDate,
+      product?.discountEndDate
     );
     const disCountPrice =
-      product.discount && !isExpired
-        ? product.price - (product.price * product.discount) / 100
+      product?.discount && !isExpired
+        ? product?.price - (product?.price * product?.discount) / 100
         : 0;
     return { isExpired, disCountPrice };
   }, [product]);
