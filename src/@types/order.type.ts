@@ -5,7 +5,7 @@ export type TItemOrderProduct = {
   price: number;
   discount: number;
   product: string;
-  slug: string;
+  slug?: string;
 };
 
 export type TItemProductMe = {

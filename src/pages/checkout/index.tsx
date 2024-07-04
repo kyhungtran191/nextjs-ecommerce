@@ -40,6 +40,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { useAppContext } from "@/context/app.context";
 import { useCartStore } from "@/stores/cart.store";
+import { TParamsCreateOrderProduct } from "@/@types/order.type";
+import { createOrder } from "@/services/order.services";
+import ComponentsLoading from "@/components/loading/ComponentsLoading";
 
 type TDefaultValue = {
   fullName: string;
@@ -127,6 +130,10 @@ export default function Checkout() {
     mutationFn: (body: any) => updateMe(body),
   });
 
+  const createOrderMutation = useMutation({
+    mutationFn: (body: TParamsCreateOrderProduct) => createOrder(body),
+  });
+
   const onSubmit = (data: any) => {
     if (isAddNew) {
       let newAddress: TUserAddress[] = cloneDeep(user?.addresses || []);
@@ -204,6 +211,32 @@ export default function Checkout() {
       : totalProductPrice;
     return { currentDeliveryPrice, totalPriceWithDelivery };
   }, [deliveryType, cart]);
+
+  const handleOrderProduct = () => {
+    const data: TParamsCreateOrderProduct = {
+      orderItems: cart,
+      fullName: toFullName(
+        isCurrentDefault?.lastName as string,
+        isCurrentDefault?.middleName as string,
+        isCurrentDefault?.firstName as string,
+        ""
+      ),
+      city: isCurrentDefault?.city as string,
+      phone: isCurrentDefault?.phoneNumber as string,
+      deliveryMethod: deliveryType as string,
+      itemsPrice: totalProductPrice,
+      shippingPrice: currentDeliveryPrice as number,
+      paymentMethod: paymentType,
+      totalPrice: totalPriceWithDelivery,
+      user: user?._id as string,
+      address: isCurrentDefault?.address as string,
+    };
+    createOrderMutation.mutate(data, {
+      onSuccess: () => {
+        toast.success("Place Order Successfully!");
+      },
+    });
+  };
 
   return (
     <div className="container py-10">
@@ -487,7 +520,18 @@ export default function Checkout() {
                 {totalPriceWithDelivery}$
               </span>
             </div>
-            <Button className="w-full py-6">Order</Button>
+            <Button
+              className={`w-full py-6 ${
+                createOrderMutation.isLoading ? "bg-opacity-0" : " "
+              }`}
+              onClick={handleOrderProduct}
+            >
+              {createOrderMutation.isLoading ? (
+                <ComponentsLoading></ComponentsLoading>
+              ) : (
+                "Order"
+              )}
+            </Button>
           </div>
         </div>
       )}
