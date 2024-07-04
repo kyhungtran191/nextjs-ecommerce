@@ -94,8 +94,6 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
     }
   };
 
-  console.log(product.name, disCountPrice);
-
   return (
     <div className="relative">
       <Link href={`/products/${product?.slug}`}>
