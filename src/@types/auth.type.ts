@@ -1,3 +1,5 @@
+import { TUserAddress } from "./user.type";
+
 export type User = {
   _id: string;
   email: string;
@@ -14,7 +16,7 @@ export type User = {
   city?: string;
   viewedProducts: string[];
   userType: number;
-  addresses: string[];
+  addresses: TUserAddress[];
   createdAt: string;
   updatedAt: string;
 };

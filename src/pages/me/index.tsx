@@ -25,7 +25,6 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
 import { updateMe } from "@/services/auth.services";
-import { User } from "@/@types/auth.type";
 
 type TDefaultValue = {
   firstName: string;

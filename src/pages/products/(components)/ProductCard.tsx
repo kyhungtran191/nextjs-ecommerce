@@ -1,7 +1,7 @@
 import { Heart, Router, ShoppingCart, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { TProductPublic } from "@/@types/product.type";
 import {
   Tooltip,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import { CartItem } from "@/@types/cart.type";
 import { useCartStore } from "@/stores/cart.store";
-import { convertAddProduct } from "@/utils/helper";
+import { convertAddProduct, isExpiry } from "@/utils/helper";
 import { useAppContext } from "@/context/app.context";
 import { getLocalProductCart, setLocalProductToCart } from "@/utils/auth";
 import { useRouter } from "next/router";
@@ -62,6 +62,18 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
     }
   };
 
+  const { isExpired, disCountPrice } = useMemo(() => {
+    const isExpired = isExpiry(
+      product.discountStartDate,
+      product.discountEndDate
+    );
+    const disCountPrice =
+      product.discount && !isExpired
+        ? product.price - (product.price * product.discount) / 100
+        : 0;
+    return { isExpired, disCountPrice };
+  }, [product]);
+
   const addProductToCart = (item: CartItem) => {
     if (!user?._id) {
       if (router.asPath !== "/" && router.asPath !== "/login") {
@@ -81,6 +93,8 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
       setLocalProductToCart({ ...parseCart, [user._id]: convertedCartItems });
     }
   };
+
+  console.log(product.name, disCountPrice);
 
   return (
     <div className="relative">
@@ -110,7 +124,7 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
             amount: 1,
             discount: product.discount,
             image: product.image,
-            price: product.price,
+            price: disCountPrice ? disCountPrice : product.price,
             product: product._id,
           };
           e.stopPropagation();
@@ -133,11 +147,17 @@ export default function ProductCard({ product }: { product: TProductPublic }) {
         <div className="flex items-center justify-between ">
           <h2 className="font-medium text-lg">{product?.name}</h2>
           <div className="flex items-center font-semibold gap-2">
-            <p className="text-red-500 line-through text-sm">
-              {product?.price}
-            </p>
+            {disCountPrice ? (
+              <>
+                <p className="text-red-500 line-through text-sm">
+                  {product?.price}$
+                </p>
+                <p className="text-base">{disCountPrice}$</p>
+              </>
+            ) : (
+              <p className="text-base">{product.price}$</p>
+            )}
             {/* Fix later */}
-            <p className="text-base">$400</p>
           </div>
         </div>
         <div className="flex items-center justify-between">

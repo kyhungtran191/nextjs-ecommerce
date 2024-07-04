@@ -13,7 +13,18 @@ export type TUser = {
   city?: string;
   status?: number;
   userType?: number;
-  addresses?: any[];
+  addresses?: TUserAddress[];
+};
+
+export type TUserAddress = {
+  firstName: string;
+  lastName: string;
+  middleName: string;
+  phoneNumber: string;
+  address: string;
+  city: string;
+  isDefault: boolean;
+  _id?: string;
 };
 
 export type TUserAdd = Pick<
