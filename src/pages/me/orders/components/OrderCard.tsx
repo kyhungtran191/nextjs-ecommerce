@@ -52,7 +52,7 @@ export default function OrderCard({ item }: { item: TItemOrderProductMe }) {
       confirmButtonText: "Yes, I want to buy again",
     }).then(async (result: any) => {
       if (result.isConfirmed) {
-        const items = item.orderItems.map((prd) => ({
+        const items = item?.orderItems?.map((prd) => ({
           name: prd.name,
           amount: prd.amount,
           image: prd.image,
@@ -61,7 +61,6 @@ export default function OrderCard({ item }: { item: TItemOrderProductMe }) {
           product: prd?.product,
           slug: prd?.product?.slug,
         }));
-        console.log(item.orderItems);
         console.log("items-pass", items);
         handleUpdateProductToCart(items as any);
         router.push("/my-cart");
@@ -70,7 +69,7 @@ export default function OrderCard({ item }: { item: TItemOrderProductMe }) {
   };
 
   const isSoldOut = useMemo(() => {
-    return item.orderItems.some((item) => item.product.countInStock < 0);
+    return item?.orderItems?.some((item) => item.product.countInStock < 0);
   }, [item]);
 
   const handleCancelOrder = (id: string) => {
@@ -109,7 +108,7 @@ export default function OrderCard({ item }: { item: TItemOrderProductMe }) {
         </div>
       </div>
       <div className="mt-4 max-h-[400px] overflow-y-auto ">
-        {item.orderItems.map((item) => (
+        {item?.orderItems?.map((item) => (
           <div
             className="flex items-start gap-4 my-2 pb-3 border-b"
             key={item.name}
