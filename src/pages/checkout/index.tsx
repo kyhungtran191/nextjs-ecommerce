@@ -43,6 +43,8 @@ import { useCartStore } from "@/stores/cart.store";
 import { TParamsCreateOrderProduct } from "@/@types/order.type";
 import { createOrder } from "@/services/order.services";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
+import { getLocalProductCart, setLocalProductToCart } from "@/utils/auth";
+import { useRouter } from "next/router";
 
 type TDefaultValue = {
   fullName: string;
@@ -95,7 +97,9 @@ export default function Checkout() {
   const { data } = useQueryCities();
   const queryClient = useQueryClient();
   const { user } = useAppContext();
-  const { cart } = useCartStore();
+  const { cart, clearCart } = useCartStore();
+  const router = useRouter();
+
   const cityOptions = useMemo(() => {
     return data?.data?.data?.cities;
   }, [data?.data?.data?.cities]);
@@ -234,6 +238,13 @@ export default function Checkout() {
     createOrderMutation.mutate(data, {
       onSuccess: () => {
         toast.success("Place Order Successfully!");
+        clearCart();
+        const cartLS = getLocalProductCart();
+        const parseCart = cartLS ? JSON.parse(cartLS) : {};
+        if (user?._id) {
+          setLocalProductToCart({ ...parseCart, [user._id]: [] });
+        }
+        router.push("/");
       },
     });
   };

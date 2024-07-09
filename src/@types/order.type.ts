@@ -59,8 +59,15 @@ export type TParamsGetOrderProducts = {
   order?: string;
 };
 
+export type TParamsGetMeProduct = {
+  limit: number;
+  page: number;
+  status?: number;
+};
+
 export type TItemOrderProductMe = {
   _id: string;
+  createdAt: string;
   shippingAddress: {
     fullName: string;
     address: string;
@@ -95,6 +102,12 @@ export type TItemOrderProductMe = {
   status: number;
   deliveryAt: Date;
   paidAt: Date;
+};
+
+export type OrderMeResult = {
+  orders: TItemOrderProductMe[];
+  totalCount: number;
+  totalPage: number;
 };
 
 export interface TItemOrderProducts extends TItemOrderProductMe {}
