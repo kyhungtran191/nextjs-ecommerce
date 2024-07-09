@@ -3,11 +3,7 @@ import { ORDER_STATUS } from "@/constants/order";
 import Image from "next/image";
 import React, { useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  convertAddProduct,
-  convertUpdateMultipleProductsCart,
-  formatDate,
-} from "@/utils/helper";
+import { convertUpdateMultipleProductsCart, formatDate } from "@/utils/helper";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { cancelMyOrder } from "@/services/order.services";
 import { toast } from "react-toastify";
@@ -15,7 +11,6 @@ import Swal from "sweetalert2";
 import { getLocalProductCart, setLocalProductToCart } from "@/utils/auth";
 import { useCartStore } from "@/stores/cart.store";
 import { useAppContext } from "@/context/app.context";
-import { CartItem } from "@/@types/cart.type";
 import { useRouter } from "next/router";
 export default function OrderCard({ item }: { item: TItemOrderProductMe }) {
   const { mutate: cancel } = useMutation({
@@ -27,7 +22,6 @@ export default function OrderCard({ item }: { item: TItemOrderProductMe }) {
   const router = useRouter();
 
   const handleUpdateProductToCart = (items: TItemOrderProduct[]) => {
-    console.log("items handle", items);
     const productCart = getLocalProductCart();
     const parseData = productCart ? JSON.parse(productCart) : {};
     const listOrderItems = convertUpdateMultipleProductsCart(cart, items);
@@ -61,7 +55,6 @@ export default function OrderCard({ item }: { item: TItemOrderProductMe }) {
           product: prd?.product,
           slug: prd?.product?.slug,
         }));
-        console.log("items-pass", items);
         handleUpdateProductToCart(items as any);
         router.push("/my-cart");
       }
@@ -111,7 +104,7 @@ export default function OrderCard({ item }: { item: TItemOrderProductMe }) {
         {item?.orderItems?.map((item) => (
           <div
             className="flex items-start gap-4 my-2 pb-3 border-b"
-            key={item.name}
+            key={item?.name}
           >
             <Image
               width={0}
@@ -129,16 +122,16 @@ export default function OrderCard({ item }: { item: TItemOrderProductMe }) {
         ))}
       </div>
       <div className="flex items-center justify-end gap-x-4 py-4 shadow-inner">
-        {item.status == 0 && (
+        {item?.status == 0 && (
           <Button
             variant={"outline"}
             className="border-red-500 text-red-500 font-bold hover:bg-red-500 hover:text-white"
-            onClick={() => handleCancelOrder(item._id)}
+            onClick={() => handleCancelOrder(item?._id)}
           >
             Cancel Order
           </Button>
         )}
-        {item.status === 3 && (
+        {item?.status === 3 && (
           <Button
             variant={"outline"}
             className={`border-green-500 text-green-500 font-bold hover:bg-green-500 hover:text-white ${
