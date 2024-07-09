@@ -1,6 +1,7 @@
 // ** Types
 // ** Libraries
 import { CartItem } from "@/@types/cart.type";
+import { TItemOrderProduct } from "@/@types/order.type";
 import { ContentState, EditorState } from "draft-js";
 import htmlToDraft from "html-to-draftjs";
 
@@ -183,6 +184,32 @@ export const convertAddProduct = (
     return cartList;
   } catch (err) {
     return orderProductList;
+  }
+};
+
+export const convertUpdateMultipleProductsCart = (
+  orderItems: TItemOrderProduct[],
+  addItems: TItemOrderProduct[]
+) => {
+  try {
+    let result = [];
+    const cloneOrderItems = cloneDeep(orderItems);
+    console.log(addItems);
+    addItems.forEach((addItem) => {
+      const findItems = cloneOrderItems.find(
+        (item: TItemOrderProduct) => item.product === addItem.product
+      );
+      if (findItems) {
+        findItems.amount += addItem.amount;
+      } else {
+        cloneOrderItems.push(addItem);
+      }
+    });
+    result = cloneOrderItems.filter((item: TItemOrderProduct) => item.amount);
+
+    return result;
+  } catch (error) {
+    return orderItems;
   }
 };
 

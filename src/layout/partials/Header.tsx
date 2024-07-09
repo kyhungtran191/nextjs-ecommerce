@@ -37,9 +37,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetClose,
@@ -299,7 +296,10 @@ export default function Header() {
                 <PopoverTrigger asChild className="cursor-pointer">
                   <Avatar>
                     <AvatarImage
-                      src="https://variety.com/wp-content/uploads/2021/04/Avatar.jpg"
+                      src={
+                        user.avatar ||
+                        "https://variety.com/wp-content/uploads/2021/04/Avatar.jpg"
+                      }
                       className="object-cover"
                     ></AvatarImage>
                     <AvatarFallback>CN</AvatarFallback>

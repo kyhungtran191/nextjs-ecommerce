@@ -81,7 +81,7 @@
     /* scroll-behavior: smooth; */
   }
   body {
-    @apply text-foreground;
+    @apply text-foreground bg-slate-100/50;
   }
 }
 
