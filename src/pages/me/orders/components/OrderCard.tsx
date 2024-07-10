@@ -12,6 +12,7 @@ import { getLocalProductCart, setLocalProductToCart } from "@/utils/auth";
 import { useCartStore } from "@/stores/cart.store";
 import { useAppContext } from "@/context/app.context";
 import { useRouter } from "next/router";
+import { Link } from "lucide-react";
 export default function OrderCard({ item }: { item: TItemOrderProductMe }) {
   const { mutate: cancel } = useMutation({
     mutationFn: (id: string) => cancelMyOrder(id),
@@ -87,7 +88,10 @@ export default function OrderCard({ item }: { item: TItemOrderProductMe }) {
   };
 
   return (
-    <div className="p-6 my-4  bg-white rounded-lg min-h-[300px] shadow-md">
+    <div
+      className="p-6 my-4  bg-white rounded-lg min-h-[300px] shadow-md cursor-pointer"
+      onClick={() => router.push(`/me/orders/${item._id}`)}
+    >
       <div className="flex items-center justify-between  pb-5 border-b">
         <div className="font-bold text-sm text-slate-600">
           {formatDate(item?.createdAt)}

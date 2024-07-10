@@ -17,6 +17,11 @@ export const getMeOrder = async (params: TParamsGetMeProduct) =>
     params,
   });
 
+export const getDetailMeOrder = async (id: string) =>
+  await instanceAxios.get<ResponseData<TItemOrderProductMe>>(
+    `${OrderAPI.INDEX}/me/${id}`
+  );
+
 export const cancelMyOrder = async (id: string) =>
   await instanceAxios.post<ResponseData<{}>>(
     `${OrderAPI.INDEX}/me/cancel/${id}`
