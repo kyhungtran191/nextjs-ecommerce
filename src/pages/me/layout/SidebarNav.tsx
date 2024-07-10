@@ -17,7 +17,6 @@ export default function SidebarNav({
   ...props
 }: SidebarNavProps) {
   const pathname = usePathname();
-
   return (
     <nav
       className={cn(
