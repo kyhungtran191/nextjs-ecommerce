@@ -38,11 +38,7 @@ import {
 import { toFullName } from "@/utils/helper";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
 import { Input } from "@/components/ui/input";
-import {
-  MultiSelect,
-  OptionType,
-  SelectedType,
-} from "@/components/MultiSelect";
+import { OptionType } from "@/components/MultiSelect";
 import { useQueryRole } from "@/query/useQueryRole";
 
 import { Icon } from "@iconify/react/dist/iconify.js";
@@ -62,6 +58,7 @@ import { ResponseData } from "@/@types/message.type";
 import { TUser } from "@/@types/user.type";
 import { UserAPI } from "@/apis/user.api";
 import { toast } from "react-toastify";
+
 type TTableData = {
   _id: string;
   fullName: string;
@@ -144,6 +141,7 @@ export default function UserPage() {
     },
     300
   );
+
   const roleData = useQueryRole();
   const cityData = useQueryCities();
   // Optimize Role
@@ -324,7 +322,7 @@ export default function UserPage() {
       },
     },
   ];
-  const queryClient = useQueryClient();
+
   const table = useReactTable({
     data: users,
     columns,
@@ -341,6 +339,7 @@ export default function UserPage() {
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   });
+
   // Delete All Handler
   const handleDeleteAll = () => {
     Swal.fire({
