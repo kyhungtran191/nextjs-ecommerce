@@ -27,7 +27,17 @@ export const cancelMyOrder = async (id: string) =>
     `${OrderAPI.INDEX}/me/cancel/${id}`
   );
 
-// export const getAllCities = async (params?: any) =>
-//   instanceAxios.get<ResponseData<{}>>(`${CityAPI.CITY}`, {
-//     params,
-//   });
+export const getAllOrders = async (params?: any) =>
+  instanceAxios.get<ResponseData<OrderMeResult>>(`${OrderAPI.INDEX}`, {
+    params,
+  });
+
+export const updateStatusOrders = async (
+  id: string,
+  body: { status: number }
+) => {
+  return await instanceAxios.put<ResponseData<TItemOrderProductMe>>(
+    `${OrderAPI.INDEX}/${id}`,
+    body
+  );
+};
