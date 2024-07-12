@@ -1,7 +1,6 @@
 import GeneralLayout from "@/layout/GeneralLayout";
 import Image from "next/image";
 import React, { ReactNode, useEffect, useState } from "react";
-import ImageSample from "../../../../public/bedroom.jpg";
 import CustomBreadCrumb from "@/components/custom-breadcrumb/CustomBreadCrumb";
 import { Eye, HeartIcon, Star } from "lucide-react";
 import {
@@ -39,6 +38,7 @@ export default function ProductDetail(props: TProps) {
   const { product, relatedData } = props;
   console.log("product", product);
   const [isClient, setIsClient] = useState(false);
+
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -46,6 +46,7 @@ export default function ProductDetail(props: TProps) {
   if (!isClient) {
     return null; // Avoid rendering on the server to prevent hydration issues
   }
+
   return (
     <div className="py-10 min-h-screen">
       <div className="grid grid-cols-12 xl:gap-10 items-start">

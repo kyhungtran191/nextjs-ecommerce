@@ -1,6 +1,5 @@
 import {
   MultiSelect,
-  OptionType,
   SelectedType,
 } from "@/components/MultiSelect";
 import { ORDER_STATUS } from "@/constants/order";

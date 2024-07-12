@@ -7,7 +7,6 @@ import {
 import { ProductAPI } from "@/apis/product.api";
 import instanceAxios from "@/configs/axiosInstance";
 
-// Admi
 export const createProduct = async (body: TProductAdd) =>
   instanceAxios.post<ResponseData<TProductAdmin>>(`${ProductAPI.ADMIN}`, body);
 
@@ -30,7 +29,6 @@ export const updateProductAdmin = async (body: TProductAdd, id: string) =>
     `${ProductAPI.ADMIN}/${id}`,
     body
   );
-
 
 // Client
 /**

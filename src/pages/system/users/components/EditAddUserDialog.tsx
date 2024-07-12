@@ -2,7 +2,6 @@ import React from "react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -22,17 +21,16 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   createUser,
   getDetailUser,
   updateUser,
 } from "@/services/user.services";
-import { TUser, TUserAdd } from "@/@types/user.type";
+import { TUserAdd } from "@/@types/user.type";
 import { separationFullName, toFullName } from "@/utils/helper";
 import { toast } from "react-toastify";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";

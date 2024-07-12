@@ -17,7 +17,6 @@ import {
 } from "react-day-picker";
 import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { ReactDatePickerProps } from "react-datepicker";
 
 interface IProps {
   className?: string;

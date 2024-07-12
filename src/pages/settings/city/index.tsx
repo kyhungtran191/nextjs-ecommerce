@@ -1,6 +1,19 @@
 import AdminDashboard from "@/layout/partials/admin/AdminLayout";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useState } from "react";
+import { useRouter } from "next/router";
+import { debounce, identity, omit, pickBy } from "lodash";
+import { usePathname } from "next/navigation";
+import PaginationCustom from "@/components/PaginationCustom";
+import { City } from "@/@types/city.type";
+import { getAllCities } from "@/services/city.services";
+import EditAddCityDialog from "./components/EditAddCityDialog";
+import Swal from "sweetalert2";
+import instanceAxios from "@/configs/axiosInstance";
+import { CityAPI } from "@/apis/city.api";
+import { ResponseData } from "@/@types/message.type";
+import { toast } from "react-toastify";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,15 +22,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { TUser } from "@/@types/user.type";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  ArrowUpDown,
-  EllipsisVertical,
-  Pencil,
-  Trash2,
-  UsersRound,
-} from "lucide-react";
+import { ArrowUpDown, EllipsisVertical, Pencil, Trash2 } from "lucide-react";
 import {
   SortingState,
   flexRender,
@@ -39,19 +45,6 @@ import { formatDate } from "@/utils/helper";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
 import { Input } from "@/components/ui/input";
 
-import { useRouter } from "next/router";
-import { debounce, identity, omit, pickBy } from "lodash";
-import { usePathname } from "next/navigation";
-import PaginationCustom from "@/components/PaginationCustom";
-import { City } from "@/@types/city.type";
-import { getAllCities } from "@/services/city.services";
-import EditAddCityDialog from "./components/EditAddCityDialog";
-import Swal from "sweetalert2";
-import instanceAxios from "@/configs/axiosInstance";
-import { CityAPI } from "@/apis/city.api";
-import { ResponseData } from "@/@types/message.type";
-import { toast } from "react-toastify";
-import { Button } from "@/components/ui/button";
 export default function CityPage() {
   const [cities, setCities] = useState<City[] | []>([]);
   const [sorting, setSorting] = useState<SortingState>([]);

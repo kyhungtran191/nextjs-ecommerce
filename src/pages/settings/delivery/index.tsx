@@ -1,6 +1,23 @@
 import AdminDashboard from "@/layout/partials/admin/AdminLayout";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useState } from "react";
+import { formatDate } from "@/utils/helper";
+import ComponentsLoading from "@/components/loading/ComponentsLoading";
+import { Input } from "@/components/ui/input";
+import { useRouter } from "next/router";
+import { debounce, identity, omit, pickBy } from "lodash";
+import { usePathname } from "next/navigation";
+import PaginationCustom from "@/components/PaginationCustom";
+import { City } from "@/@types/city.type";
+import Swal from "sweetalert2";
+import instanceAxios from "@/configs/axiosInstance";
+import { ResponseData } from "@/@types/message.type";
+import { toast } from "react-toastify";
+import EditAddDeliveryDialog from "./components/EditAddDeliveryDialog";
+import { TDelivery } from "@/@types/delivery.type";
+import { getAllDelivery } from "@/services/delivery.services";
+import { DELIVERYAPI } from "@/apis/delivery.api";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,24 +51,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate } from "@/utils/helper";
-import ComponentsLoading from "@/components/loading/ComponentsLoading";
-import { Input } from "@/components/ui/input";
 
-import { useRouter } from "next/router";
-import { debounce, identity, omit, pickBy } from "lodash";
-import { usePathname } from "next/navigation";
-import PaginationCustom from "@/components/PaginationCustom";
-import { City } from "@/@types/city.type";
-import Swal from "sweetalert2";
-import instanceAxios from "@/configs/axiosInstance";
-import { ResponseData } from "@/@types/message.type";
-import { toast } from "react-toastify";
-import EditAddDeliveryDialog from "./components/EditAddDeliveryDialog";
-import { TDelivery } from "@/@types/delivery.type";
-import { getAllDelivery } from "@/services/delivery.services";
-import { DELIVERYAPI } from "@/apis/delivery.api";
-import { Button } from "@/components/ui/button";
 export default function DeliveryPage() {
   const [delivery, setDelivery] = useState<TDelivery[] | []>([]);
   const [sorting, setSorting] = useState<SortingState>([]);

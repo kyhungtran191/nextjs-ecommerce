@@ -45,10 +45,9 @@ export const unlikeProduct = async (body: { productId: string }) => {
 export const getFavoriteProduct = async ({
   page = 1,
   limit = 6,
-}: // search = "",
-{
+}: {
   page?: number;
-  // search?: string;
+
   limit?: number;
 }) => {
   return await instanceAxios.get<
