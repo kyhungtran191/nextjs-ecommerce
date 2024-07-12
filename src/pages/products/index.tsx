@@ -1,5 +1,5 @@
 import GeneralLayout from "@/layout/GeneralLayout";
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import ChairImage from "../../../public/chair-banner.png";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -7,12 +7,22 @@ import CustomBreadCrumb from "@/components/custom-breadcrumb/CustomBreadCrumb";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import SliderCustom from "./(components)/SliderCustom";
+import ProductCard from "./(components)/ProductCard";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/router";
+import { debounce, identity, omit, pickBy } from "lodash";
+import { useQuery } from "@tanstack/react-query";
+import { getAllProductTypes } from "@/services/product-type.services";
+import { getProductPublic } from "@/services/product-public.services";
+import useDetectIsLoadingSSR from "@/hooks/useDetectIsLoadingSSR";
+import SkeletonCard from "@/components/SkeletonCard";
+import { TProductPublic } from "@/@types/product.type";
+import PaginationCustom from "@/components/PaginationCustom";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -26,21 +36,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-
-import SliderCustom from "./(components)/SliderCustom";
-import ProductCard from "./(components)/ProductCard";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/router";
-import { useSearchParams } from "next/navigation";
-import { debounce, identity, omit, pickBy } from "lodash";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAllProductTypes } from "@/services/product-type.services";
-import { getProductPublic } from "@/services/product-public.services";
-import ComponentsLoading from "@/components/loading/ComponentsLoading";
-import useDetectIsLoadingSSR from "@/hooks/useDetectIsLoadingSSR";
-import SkeletonCard from "@/components/SkeletonCard";
-import { TProductPublic } from "@/@types/product.type";
-import PaginationCustom from "@/components/PaginationCustom";
 
 type TProps = {
   products: TProductPublic[];

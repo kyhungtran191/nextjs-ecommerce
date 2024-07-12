@@ -1,7 +1,7 @@
-import { Heart, Router, ShoppingCart, Star } from "lucide-react";
+import { Heart, ShoppingCart, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { TProductPublic } from "@/@types/product.type";
 import {
   Tooltip,

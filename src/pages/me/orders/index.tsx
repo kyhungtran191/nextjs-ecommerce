@@ -1,13 +1,12 @@
 import GeneralLayout from "@/layout/GeneralLayout";
 import React, { ReactNode, useState } from "react";
-import DashboardLayout from "../layout/DashboardLayout ";
+import DashboardLayout from "../layout/DashboardLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { getMeOrder } from "@/services/order.services";
 import OrderCard from "./components/OrderCard";
 import { TParamsGetMeProduct } from "@/@types/order.type";
-import { Skeleton } from "@/components/ui/skeleton";
 import SkeletonCard from "@/components/SkeletonCard";
 import PaginationCustom from "@/components/PaginationCustom";
 

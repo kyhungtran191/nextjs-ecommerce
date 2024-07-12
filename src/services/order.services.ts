@@ -4,7 +4,6 @@ import {
   TItemOrderProductMe,
   TParamsCreateOrderProduct,
   TParamsGetMeProduct,
-  TParamsGetOrderProducts,
 } from "@/@types/order.type";
 import { OrderAPI } from "@/apis/orders.api";
 import instanceAxios from "@/configs/axiosInstance";

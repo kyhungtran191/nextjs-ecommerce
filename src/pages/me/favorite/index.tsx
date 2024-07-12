@@ -1,15 +1,13 @@
 import GeneralLayout from "@/layout/GeneralLayout";
 import React, { ReactNode } from "react";
-import DashboardLayout from "../layout/DashboardLayout ";
+import DashboardLayout from "../layout/DashboardLayout";
 import ProductCard from "@/pages/products/(components)/ProductCard";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getFavoriteProduct } from "@/services/product-public.services";
-import { Button } from "@/components/ui/button";
 import { TProductPublic } from "@/@types/product.type";
 import { useRouter } from "next/router";
 import { identity, pickBy } from "lodash";
 import PaginationCustom from "@/components/PaginationCustom";
-import ComponentsLoading from "@/components/loading/ComponentsLoading";
 import SkeletonCard from "@/components/SkeletonCard";
 
 export default function Favorite() {
@@ -21,7 +19,7 @@ export default function Favorite() {
     limit: 6,
   };
 
-  const { data, error, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["favorite-me"],
     queryFn: () => getFavoriteProduct(pickBy(queryData, identity)),
   });

@@ -1,5 +1,4 @@
 import { ResponseData } from "@/@types/message.type";
-import { RoleData, RoleDataList } from "@/@types/role.type";
 import { TUser, TUserAdd, UserDataList } from "@/@types/user.type";
 import { UserAPI } from "@/apis/user.api";
 import instanceAxios from "@/configs/axiosInstance";

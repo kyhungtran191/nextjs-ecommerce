@@ -1,10 +1,8 @@
 // ** React Imports
 
 import { useAppContext } from "@/context/app.context";
-import Login from "@/pages/login";
 import { useRouter } from "next/router";
 import { ReactNode, ReactElement, useEffect, useState } from "react";
-import ComponentsLoading from "../loading/ComponentsLoading";
 import { clearLS } from "@/utils/auth";
 
 interface AuthGuardProps {

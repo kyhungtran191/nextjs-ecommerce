@@ -1,18 +1,16 @@
 import GeneralLayout from "@/layout/GeneralLayout";
 import React, { ReactNode, useMemo } from "react";
-import DashboardLayout from "../../layout/DashboardLayout ";
+import DashboardLayout from "../../layout/DashboardLayout";
 import { useRouter } from "next/router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { cancelMyOrder, getDetailMeOrder } from "@/services/order.services";
 import SkeletonCard from "@/components/SkeletonCard";
-import OrderCard from "../components/OrderCard";
 import Image from "next/image";
 import CustomBreadCrumb from "@/components/custom-breadcrumb/CustomBreadCrumb";
 import { ORDER_STATUS } from "@/constants/order";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableFooter,
   TableHead,
@@ -40,7 +38,6 @@ export default function OrderDetail() {
     mutationFn: (id: string) => cancelMyOrder(id),
   });
   const { user } = useAppContext();
-  const queryClient = useQueryClient();
   const { cart, updateCart } = useCartStore();
 
   const handleUpdateProductToCart = (items: TItemOrderProduct[]) => {

@@ -1,19 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Icon } from "@iconify/react";
 import * as yup from "yup";
-import LoginThumb from "../../../public/login-thumb.jpg";
 import Logo from "../../../public/logo.png";
 import { EMAIL_REG, PASSWORD_REG } from "@/utils/regex";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "@tanstack/react-query";
 import { TLogin } from "@/@types/auth.type";
-import { ResponseLogin, register } from "@/services/auth.services";
+import { register } from "@/services/auth.services";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 type TDefaultValue = {

@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 import {
   Breadcrumb,
   BreadcrumbItem,

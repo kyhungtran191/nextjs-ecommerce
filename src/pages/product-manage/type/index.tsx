@@ -43,15 +43,10 @@ import { useRouter } from "next/router";
 import { debounce, identity, omit, pickBy } from "lodash";
 import { usePathname } from "next/navigation";
 import PaginationCustom from "@/components/PaginationCustom";
-import Swal from "sweetalert2";
-import instanceAxios from "@/configs/axiosInstance";
-import { ResponseData } from "@/@types/message.type";
-import { toast } from "react-toastify";
-import { Button } from "@/components/ui/button";
+
 import EditAddProductTypeDialog from "./components/EditAddTypeDialog";
 import { TProductType } from "@/@types/product-type.type";
 import { getAllProductTypes } from "@/services/product-type.services";
-import { ProductTypesAPI } from "@/apis/product-type.api";
 export default function ProductTypePage() {
   const [types, setTypes] = useState<TProductType[] | []>([]);
   const [sorting, setSorting] = useState<SortingState>([]);

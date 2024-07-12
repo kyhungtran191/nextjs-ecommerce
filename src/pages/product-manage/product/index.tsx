@@ -1,7 +1,6 @@
 import AdminDashboard from "@/layout/partials/admin/AdminLayout";
-import { getAllUser } from "@/services/user.services";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import React, { ReactNode, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,7 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate, formatNumberToLocal } from "@/utils/helper";
+import { formatDate } from "@/utils/helper";
 import ComponentsLoading from "@/components/loading/ComponentsLoading";
 import { Input } from "@/components/ui/input";
 
@@ -64,7 +63,6 @@ export default function ProductPage() {
   const [products, setProducts] = useState<TProductAdmin[] | []>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
-
   const [openDialog, setOpenDialog] = useState<boolean>(false);
   const [editProduct, setEditProduct] = useState<undefined | string>(undefined);
   const [pageSize, setPageSize] = useState<number>(1);

@@ -1,14 +1,21 @@
-import React, {
-  ReactNode,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { Search } from "@/components/Search";
 import AdminDashboard from "@/layout/partials/admin/AdminLayout";
 import { LockKeyhole, Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Controller, useForm } from "react-hook-form";
+import PermissionTable from "./components/permissionsTable";
+import { PERMISSIONS } from "@/configs/permission";
+import { getAllValueOfObject } from "@/utils/helper";
+import ComponentsLoading from "@/components/loading/ComponentsLoading";
+import { usePermission } from "@/hooks/usePermissions";
+import { useQueryRole } from "@/query/useQueryRole";
+import Swal from "sweetalert2";
+import instanceAxios from "@/configs/axiosInstance";
+import { ResponseData } from "@/@types/message.type";
+import { RoleAPI } from "@/apis/role.api";
 import {
   Table,
   TableBody,
@@ -29,7 +36,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   flexRender,
   getCoreRowModel,
@@ -42,19 +48,7 @@ import {
   getDetailRole,
   updateRole,
 } from "@/services/role.services";
-import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { Controller, useForm } from "react-hook-form";
-import PermissionTable from "./components/permissionsTable";
-import { PERMISSIONS } from "@/configs/permission";
-import { getAllValueOfObject } from "@/utils/helper";
-import ComponentsLoading from "@/components/loading/ComponentsLoading";
-import { usePermission } from "@/hooks/usePermissions";
-import { useQueryRole } from "@/query/useQueryRole";
-import Swal from "sweetalert2";
-import instanceAxios from "@/configs/axiosInstance";
-import { ResponseData } from "@/@types/message.type";
-import { RoleAPI } from "@/apis/role.api";
+
 type RoleData = {
   _id: string;
   name: string;

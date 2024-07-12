@@ -3,7 +3,6 @@ import GeneralLayout from "@/layout/GeneralLayout";
 import React, { ReactNode, useMemo } from "react";
 import Banner from "./(components)/Banner";
 import Link from "next/link";
-import ProductCartImage from "../../../public/bedroom.jpg";
 import Image from "next/image";
 import Close from "./(components)/CloseIcon";
 import QuantityController from "@/components/QuantityController";
@@ -157,18 +156,6 @@ export default function MyCart() {
                   +
                 </div>
               </div>
-              {/* <div className="flex justify-between items-center">
-                <h3 className="text-base font-semibold">
-                  Total Product Value:
-                </h3>
-                <span className="text-base font-semibold">
-                  {totalPrice || 0}$
-                </span>
-              </div>
-              <div className="flex justify-between items-center pb-5 border-b border-darkGrey">
-                <h3 className="text-base font-semibold">Total Delivery Fee:</h3>
-                <span className="text-base font-semibold">8,218,000₫</span>
-              </div> */}
               <div className="flex justify-between items-center my-2">
                 <h3 className="text-xl font-bold">Total:</h3>
                 <span className="text-xl font-bold text-red-600">
