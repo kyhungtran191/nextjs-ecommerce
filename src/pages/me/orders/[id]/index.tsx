@@ -1,5 +1,5 @@
 import GeneralLayout from "@/layout/GeneralLayout";
-import React, { ReactNode, useMemo } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import DashboardLayout from "../../layout/DashboardLayout";
 import { useRouter } from "next/router";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -20,13 +20,32 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAppContext } from "@/context/app.context";
 import { useCartStore } from "@/stores/cart.store";
-import { TItemOrderProduct } from "@/@types/order.type";
+import { TItemOrderProduct, TItemProductMe } from "@/@types/order.type";
 import { getLocalProductCart, setLocalProductToCart } from "@/utils/auth";
 import { convertUpdateMultipleProductsCart } from "@/utils/helper";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
-
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import * as yup from "yup";
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import Ratings from "../components/Ratings";
+import { TReview } from "@/@types/review.type";
+import { createReview } from "@/services/review.services";
+type TDefaultValue = {
+  content: string;
+};
 export default function OrderDetail() {
+  const [selectedStar, setSelectedStar] = useState<number>(0);
   const router = useRouter();
   const id = router.query.id;
   const { data, isLoading, refetch } = useQuery({
@@ -37,8 +56,15 @@ export default function OrderDetail() {
   const { mutate: cancel } = useMutation({
     mutationFn: (id: string) => cancelMyOrder(id),
   });
+  const [itemReview, setItemReview] = useState<TItemProductMe | undefined>(
+    undefined
+  );
+
   const { user } = useAppContext();
   const { cart, updateCart } = useCartStore();
+  const { mutate: addReview } = useMutation({
+    mutationFn: (body: TReview) => createReview(body),
+  });
 
   const handleUpdateProductToCart = (items: TItemOrderProduct[]) => {
     const productCart = getLocalProductCart();
@@ -81,7 +107,7 @@ export default function OrderDetail() {
   };
 
   const orderInfo = data && data?.data?.data;
-  console.log(data?.data.data);
+
   const isSoldOut = useMemo(() => {
     return orderInfo?.orderItems?.some((item) => item.product.countInStock < 0);
   }, [orderInfo]);
@@ -106,6 +132,56 @@ export default function OrderDetail() {
       }
     });
   };
+  const schema = yup.object().shape({
+    content: yup.string().required("Required_field"),
+  });
+
+  const defaultValues: TDefaultValue = {
+    content: "",
+  };
+
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+    setError,
+  } = useForm({
+    defaultValues,
+    mode: "onBlur",
+    resolver: yupResolver(schema),
+  });
+
+  const handleAddReview = (value: TDefaultValue) => {
+    if (selectedStar <= 0) {
+      toast.error("Please provide rating star");
+      return;
+    }
+    if (user) {
+      console.log(itemReview);
+      addReview(
+        {
+          content: value.content,
+          product: itemReview?.product._id as string,
+          star: selectedStar,
+          user: user._id,
+        },
+        {
+          onSuccess: () => {
+            toast.success("Add Review Success !");
+            let slug = itemReview?.product.slug;
+            router.push(`/products/${slug}`);
+          },
+        }
+      );
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      setSelectedStar(0);
+      setItemReview(undefined);
+    };
+  }, []);
 
   return (
     <div>
@@ -155,6 +231,60 @@ export default function OrderDetail() {
                   <h3 className="text-base font-medium">{item?.price} $</h3>
                   <h3 className="text-sm font-medium">X{item?.amount}</h3>
                 </div>
+                {orderInfo.status == 2 && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="text-sm border-blue-500 text-blue-500 font-semibold hover:text-blue-500"
+                      >
+                        Add Review
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="">
+                      <DialogHeader>
+                        <DialogTitle className="text-base font-bold">
+                          Add Your Experience
+                        </DialogTitle>
+                      </DialogHeader>
+                      <form
+                        onSubmit={handleSubmit((value) => {
+                          setItemReview(item);
+                          return handleAddReview(value);
+                        })}
+                      >
+                        <Ratings
+                          selectedStar={selectedStar}
+                          setSelectedStar={setSelectedStar}
+                        ></Ratings>
+                        <div className="my-6">
+                          <div className="mb-1 font-bold text-base">
+                            Content
+                          </div>
+                          <Controller
+                            control={control}
+                            name="content"
+                            render={({ field }) => (
+                              <textarea
+                                className="px-4 py-6 outline-none text-sm min-h-[200px] border w-full"
+                                placeholder="Content"
+                                {...field}
+                              ></textarea>
+                            )}
+                          />
+                          <div className="my-2 text-red-500 text-sm font-medium">
+                            {errors?.content && errors?.content?.message}
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button className="w-full bg-blue-500 text-white font-medium hover:bg-blue-600">
+                            Finish
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                )}
               </div>
             ))}
         </div>
