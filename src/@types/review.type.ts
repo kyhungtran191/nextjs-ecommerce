@@ -1,6 +1,13 @@
+import { User } from "./auth.type";
+
 export type TReview = {
   content: string;
-  start: number;
+  star: number;
   product: string;
-  user: string;
+  user: User | string;
+};
+export type ReviewList  = {
+  reviews: TReview[];
+  totalPage: number;
+  totalCount: number;
 };

@@ -1,8 +1,15 @@
 import GeneralLayout from "@/layout/GeneralLayout";
 import Image from "next/image";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import CustomBreadCrumb from "@/components/custom-breadcrumb/CustomBreadCrumb";
-import { Eye, HeartIcon, Star } from "lucide-react";
+import {
+  EllipsisVertical,
+  Eye,
+  HeartIcon,
+  Pencil,
+  Star,
+  Trash2,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -28,20 +35,162 @@ import {
   getRelatedProduct,
 } from "@/services/product-public.services";
 import { TProductPublic } from "@/@types/product.type";
-
+import ProductRating from "../(components)/ProductRating";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  deleteMyReview,
+  getAllReview,
+  getDetailReview,
+  updateMyReview,
+} from "@/services/review.services";
+import { User } from "@/@types/auth.type";
+import { toFullName, transformDate } from "@/utils/helper";
+import {
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenu,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useAppContext } from "@/context/app.context";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { toast } from "react-toastify";
+import Ratings from "@/pages/me/orders/components/Ratings";
+import { useRouter } from "next/router";
+import { TReview } from "@/@types/review.type";
+import Swal from "sweetalert2";
+import ComponentsLoading from "@/components/loading/ComponentsLoading";
 type TProps = {
   product: TProductPublic;
   relatedData: TProductPublic[];
 };
-
+type TDefaultValue = {
+  content: string;
+};
 export default function ProductDetail(props: TProps) {
   const { product, relatedData } = props;
-  console.log("product", product);
+  const [tabMode, setTabMode] = useState<string>("description");
   const [isClient, setIsClient] = useState(false);
+  const [idEdit, setIdEdit] = useState<string | undefined>(undefined);
+  const [selectedStar, setSelectedStar] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const {
+    data: reviewData,
+    refetch,
+    isLoading: isLoadingReview,
+  } = useQuery({
+    queryKey: ["reviews-product"],
+    queryFn: () =>
+      getAllReview({
+        order: "created asc",
+        productId: product._id,
+      }),
+    enabled: Boolean(tabMode === "reviews"),
+  });
+
+  const { user } = useAppContext();
+  const router = useRouter();
+
+  const schema = yup.object().shape({
+    content: yup.string().required("Required_field"),
+  });
+
+  const defaultValues: TDefaultValue = {
+    content: "",
+  };
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+    setError,
+    reset,
+    setValue,
+  } = useForm({
+    defaultValues,
+    mode: "onBlur",
+    resolver: yupResolver(schema),
+  });
+
+  const { mutate: updateReview } = useMutation({
+    mutationFn: (data: { body: TReview; id: string }) =>
+      updateMyReview(data?.body, data?.id),
+  });
+
+  const { data: detailEditData } = useQuery({
+    queryKey: ["detail-review", idEdit],
+    queryFn: () => getDetailReview(idEdit as string),
+    enabled: Boolean(idEdit),
+  });
+
+  const editingReviewData = useMemo(() => {
+    if (detailEditData?.data.data) {
+      setSelectedStar(detailEditData?.data?.data?.star);
+      setValue("content", detailEditData?.data?.data?.content);
+    }
+    return detailEditData?.data.data;
+  }, [detailEditData?.data?.data]);
+  console.log(detailEditData);
+
+  const handleUpdateReview = (value: TDefaultValue) => {
+    if (selectedStar <= 0) {
+      toast.error("Please provide rating star");
+      return;
+    }
+    if (user) {
+      updateReview(
+        {
+          body: {
+            content: value.content,
+            product: editingReviewData?.product as string,
+            star: selectedStar,
+            user: user._id,
+          },
+          id: idEdit as string,
+        },
+        {
+          onSuccess: () => {
+            setIdEdit(undefined);
+            reset({});
+            refetch();
+            toast.success("Update Review Success !");
+            router.replace(`/products/${product.slug}`);
+          },
+        }
+      );
+    }
+  };
+
+  const handleDeleteReview = (id: string) => {
+    Swal.fire({
+      title: "Are you sure to delete this review?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, I want to delete it",
+    }).then(async (result: any) => {
+      if (result.isConfirmed) {
+        await deleteMyReview(id).then(() => {
+          toast.success("Delete Review Success !");
+          refetch();
+        });
+      }
+    });
+  };
 
   if (!isClient) {
     return null; // Avoid rendering on the server to prevent hydration issues
@@ -85,13 +234,9 @@ export default function ProductDetail(props: TProps) {
             </h3>
             <div className="flex items-center gap-3 my-3">
               <div className="flex items-center">
-                {Array(5)
-                  .fill(0)
-                  .map((item, index) => (
-                    <Star fill="#f7d100" strokeWidth={0} key={index} />
-                  ))}
+                <ProductRating rating={product?.averageRating}></ProductRating>
               </div>
-              <p className="font-medium text-xl">{product.averageRating}</p>
+              <p className="font-medium text-xl">{product?.averageRating}</p>
               <p className="text-slate-500 font-medium text-sm">
                 {product.totalReviews} Reviews
               </p>
@@ -130,7 +275,11 @@ export default function ProductDetail(props: TProps) {
           </div>
         </div>
       </div>
-      <Tabs defaultValue="description" className="w-full medium:mt-5">
+      <Tabs
+        defaultValue={tabMode}
+        onValueChange={setTabMode}
+        className="w-full medium:mt-5"
+      >
         <TabsList className="w-full gap-2">
           <TabsTrigger
             value="description"
@@ -158,7 +307,119 @@ export default function ProductDetail(props: TProps) {
           <div dangerouslySetInnerHTML={{ __html: product.description }} />
         </TabsContent>
         <TabsContent value="reviews" className="p-5">
-          Change your password here.
+          <Dialog open={Boolean(editingReviewData)}>
+            <DialogContent className="">
+              <DialogHeader>
+                <DialogTitle className="text-base font-bold">
+                  Add Your Experience
+                </DialogTitle>
+              </DialogHeader>
+              <form
+                onSubmit={handleSubmit((value) => {
+                  return handleUpdateReview(value);
+                })}
+              >
+                <Ratings
+                  selectedStar={selectedStar}
+                  setSelectedStar={setSelectedStar}
+                ></Ratings>
+                <div className="my-6">
+                  <div className="mb-1 font-bold text-base">Content</div>
+                  <Controller
+                    control={control}
+                    name="content"
+                    render={({ field }) => (
+                      <textarea
+                        className="px-4 py-6 outline-none text-sm min-h-[200px] border w-full"
+                        placeholder="Content"
+                        {...field}
+                      ></textarea>
+                    )}
+                  />
+                  <div className="my-2 text-red-500 text-sm font-medium">
+                    {errors?.content && errors?.content?.message}
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button className="w-full bg-blue-500 text-white font-medium hover:bg-blue-600">
+                    Finish
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+          <div className="grid grid-cols-3 gap-10">
+            {isLoadingReview && (
+              <div className="flex items-center justify-center col-span-3 my-10">
+                <ComponentsLoading></ComponentsLoading>
+              </div>
+            )}
+            {!isLoadingReview &&
+              reviewData?.data?.data?.reviews?.map((item) => (
+                <div
+                  key={item.user + item.product}
+                  className="rounded-lg shadow-md p-5"
+                >
+                  <div className=" flex justify-between">
+                    <div className="flex items-start gap-2">
+                      <Image
+                        src={(item?.user as User)?.avatar as string}
+                        width={0}
+                        height={0}
+                        alt="user"
+                        className="w-12 h-12 rounded-full flex-shrink-0"
+                      ></Image>
+                      <div>
+                        <p className="font-semibold text-sm">
+                          {toFullName(
+                            (item?.user as User)?.lastName,
+                            (item?.user as User)?.firstName,
+                            (item?.user as User)?.middleName,
+                            ""
+                          )}
+                          <ProductRating rating={item?.star}></ProductRating>
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      {user && user._id === (item?.user as User)?._id && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <EllipsisVertical className="cursor-pointer" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-56">
+                            <DropdownMenuGroup>
+                              <DropdownMenuItem
+                                onSelect={() => {
+                                  setIdEdit((item as any)?._id);
+                                }}
+                              >
+                                <Pencil className="w-4 h-4 mr-2" />
+                                <span>Edit Comment</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onSelect={() => {
+                                  handleDeleteReview((item as any)?._id);
+                                }}
+                              >
+                                <Trash2 className="w-4 h-4 mr-2"></Trash2>
+                                <span>Delete Comment</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-5 text-ellipsis line-clamp-4 max-h-[300px]">
+                    {item?.content}
+                  </div>
+                  <div className="text-slate-600 text-right font-semibold text-sm">
+                    {transformDate((item as any)?.createdAt as any)}
+                  </div>
+                </div>
+              ))}
+          </div>
         </TabsContent>
         <TabsContent value="faq" className="p-5 max-h-[500px] overflow-y-auto">
           <Accordion type="single" collapsible className="w-full">

@@ -4,6 +4,7 @@ import { CartItem } from "@/@types/cart.type";
 import { TItemOrderProduct } from "@/@types/order.type";
 import { ContentState, EditorState } from "draft-js";
 import htmlToDraft from "html-to-draftjs";
+import moment from "moment";
 
 export const toFullName = (
   lastName: string,
@@ -132,6 +133,17 @@ export const stringToSlug = (str: string) => {
   return str;
 };
 
+export function transformDate(givenDate: Date) {
+  if (moment().subtract(7, "days").valueOf() > moment(givenDate).valueOf()) {
+    return moment(givenDate).format("llll");
+  } else if (
+    moment().subtract(1, "days").valueOf() > moment(givenDate).valueOf()
+  ) {
+    return moment(givenDate).calendar();
+  } else {
+    return moment(givenDate).fromNow();
+  }
+}
 // export const convertHTMLToDraft = (html: string) => {
 //   const blocksFromHtml = htmlToDraft(html);
 //   const { contentBlocks, entityMap } = blocksFromHtml;

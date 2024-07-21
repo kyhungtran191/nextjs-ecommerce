@@ -16,6 +16,9 @@ export default function OrderCard({ item }: { item: TItemOrderProductMe }) {
   const { mutate: cancel } = useMutation({
     mutationFn: (id: string) => cancelMyOrder(id),
   });
+
+  console.log("item", item);
+
   const { user } = useAppContext();
   const queryClient = useQueryClient();
   const { cart, updateCart } = useCartStore();
